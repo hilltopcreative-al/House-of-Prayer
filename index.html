@@ -158,6 +158,36 @@
   .search-item:hover{background:rgba(91,163,232,.2);}
   .search-item-flag{font-size:1rem;flex-shrink:0;}
   .search-no-results{padding:10px 12px;font-size:.78rem;color:var(--text-dim);font-style:italic;}
+  /* Continent view */
+  .continent-wrap{position:relative;}
+  .continent-btn{display:flex;align-items:center;gap:7px;background:rgba(91,163,232,.14);border:1px solid rgba(91,163,232,.38);color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:7px 12px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;}
+  .continent-btn:hover,.continent-btn.active{background:rgba(91,163,232,.28);border-color:rgba(91,163,232,.7);color:var(--white);}
+  .continent-dropdown{position:absolute;top:calc(100% + 5px);right:0;width:190px;background:#0d1e38;border:1px solid rgba(91,163,232,.35);border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.65);z-index:320;display:none;overflow:hidden;}
+  .continent-dropdown.open{display:block;}
+  .continent-item{width:100%;border:none;border-bottom:1px solid rgba(59,130,196,.14);background:transparent;color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;text-align:left;padding:9px 12px;cursor:pointer;}
+  .continent-item:last-child{border-bottom:none;}
+  .continent-item:hover,.continent-item.active{background:rgba(91,163,232,.22);color:#ffffff;}
+  .continent-badge{position:absolute;top:14px;left:16px;z-index:12;display:none;align-items:center;gap:10px;background:rgba(0,15,33,.76);border:1px solid rgba(91,163,232,.35);border-radius:4px;padding:8px 10px;box-shadow:0 8px 28px rgba(0,0,0,.35);backdrop-filter:blur(8px);}
+  .continent-badge.open{display:flex;}
+  .continent-badge span{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.12em;color:#ffffff;line-height:1;}
+  .continent-reset{background:none;border:none;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;padding:0;}
+  .continent-reset:hover{color:#ffffff;}
+  .map-container.continent-mode #worldMap .country.out-of-continent{opacity:.12;fill:#25425f;stroke:rgba(120,180,255,.12);}
+  .map-container.continent-mode #worldMap .country.in-continent{opacity:1;}
+  .map-container.continent-mode #worldMap .country.out-of-continent:hover{fill:#31516f;}
+  #worldMap .country{transition:fill .2s,opacity .2s;}
+  @media (max-width: 980px) {
+    header{padding:12px 16px;gap:10px;flex-wrap:wrap;}
+    .header-left{width:100%;}
+    .header-left h1{font-size:1.7rem;}
+    .header-left p{font-size:.86rem;}
+    .search-wrap{order:3;max-width:none !important;width:100%;margin:4px 0 0 !important;}
+    .search-input{width:100%;}
+    .layout{flex-direction:column;}
+    .map-container{min-height:48vh;}
+    .side-panel{width:100%;max-height:42vh;border-left:none;border-top:1px solid rgba(59,130,196,.25);}
+    .continent-badge{top:10px;left:10px;}
+  }
   /* Color editor */
   .color-section{font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:.2em;color:var(--gold);margin:12px 0 8px;}
   .color-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;}
@@ -191,6 +221,13 @@
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;" data-no-export="true">
     <div style="display:flex;gap:8px;">
+      <div class="continent-wrap">
+        <button class="continent-btn" id="continentBtn" onclick="toggleContinentMenu()" title="Choose Continent">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 010 20"/><path d="M12 2a15.3 15.3 0 000 20"/></svg>
+          <span id="continentBtnLabel">Continents</span>
+        </button>
+        <div class="continent-dropdown" id="continentDropdown"></div>
+      </div>
       <button class="upload-btn" onclick="openSettingsModal()" style="padding:7px 10px;" title="Magnifier Settings">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </button>
@@ -210,6 +247,10 @@
 <div class="layout">
   <div class="map-container" id="mapContainer">
     <svg id="worldMap" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block;"></svg>
+    <div class="continent-badge" id="continentBadge">
+      <span id="continentBadgeName"></span>
+      <button class="continent-reset" onclick="clearContinentView()">World View</button>
+    </div>
     <div class="magnifier" id="magnifier">
       <div class="magnifier-circle">
         <svg id="magSvg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -663,6 +704,8 @@ const mapContainer = document.getElementById('mapContainer');
 
 let selectedCountry = null, countryPaths = {}, pathElements = {}, featureMap = {};
 let geoPath, geoProjection;
+let activeContinent = null;
+const CONTINENTS = ['Africa','Antarctica','Asia','Europe','North America','Oceania','South America'];
 const MAG_AREA_THRESHOLD = 8000;
 // User-adjustable magnifier settings
 let magZoomMultiplier = 1.0;
@@ -762,6 +805,128 @@ function buildD3Map(world) {
   });
 
   populateModalSelect();
+  renderContinentMenu();
+  applyContinentClasses();
+}
+
+function getCountryContinent(alpha2) {
+  if (alpha2 === 'N10') return 'Antarctica';
+  const overrides = {
+    AM:'Asia', AZ:'Asia', CY:'Asia', GE:'Asia', RU:'Asia', TR:'Asia',
+    GL:'North America',
+    FK:'South America'
+  };
+  if (overrides[alpha2]) return overrides[alpha2];
+
+  const region = (countryData[alpha2]?.region || '').toLowerCase();
+  if (!region) return null;
+  if (region.includes('africa') || region.includes('indian ocean')) return 'Africa';
+  if (region.includes('caribbean') || region.includes('central america') || region.includes('north america')) return 'North America';
+  if (region.includes('south america') || region.includes('south atlantic')) return 'South America';
+  if (region.includes('pacific') || region.includes('oceania')) return 'Oceania';
+  if (region.includes('europe')) return 'Europe';
+  if (
+    region.includes('middle east') ||
+    region.includes('asia') ||
+    region.includes('caucasus')
+  ) return 'Asia';
+  return null;
+}
+
+function renderContinentMenu() {
+  const dropdown = document.getElementById('continentDropdown');
+  if (!dropdown) return;
+  dropdown.innerHTML = CONTINENTS.map(name =>
+    `<button class="continent-item ${name === activeContinent ? 'active' : ''}" onclick="setContinentView('${name}')">${name}</button>`
+  ).join('');
+}
+
+function toggleContinentMenu() {
+  document.getElementById('continentDropdown')?.classList.toggle('open');
+}
+
+function clearSelectedCountry() {
+  if (selectedCountry && pathElements[selectedCountry]) {
+    pathElements[selectedCountry].classList.remove('selected');
+    const magEl = magSvg.querySelector(`[data-id="${selectedCountry}"]`);
+    if (magEl) magEl.classList.remove('mag-selected');
+  }
+  selectedCountry = null;
+  magnifier.style.display = 'none';
+  connectorSvg.style.display = 'none';
+  document.getElementById('panelEmpty').style.display = 'flex';
+  document.getElementById('panelContent').style.display = 'none';
+}
+
+function setContinentView(continent) {
+  if (selectedCountry && getCountryContinent(selectedCountry) !== continent) {
+    clearSelectedCountry();
+  }
+  activeContinent = continent;
+  document.getElementById('continentDropdown')?.classList.remove('open');
+  document.getElementById('continentBtn')?.classList.add('active');
+  const label = document.getElementById('continentBtnLabel');
+  if (label) label.textContent = continent;
+  const badge = document.getElementById('continentBadge');
+  const badgeName = document.getElementById('continentBadgeName');
+  if (badgeName) badgeName.textContent = continent;
+  badge?.classList.add('open');
+  mapContainer.classList.add('continent-mode');
+  applyContinentClasses();
+  focusContinent(continent);
+  renderContinentMenu();
+}
+
+function clearContinentView() {
+  activeContinent = null;
+  mapSvg.setAttribute('viewBox', '0 0 1000 500');
+  mapContainer.classList.remove('continent-mode');
+  document.getElementById('continentBadge')?.classList.remove('open');
+  document.getElementById('continentBtn')?.classList.remove('active');
+  const label = document.getElementById('continentBtnLabel');
+  if (label) label.textContent = 'Continents';
+  applyContinentClasses();
+  renderContinentMenu();
+  refreshMagnifier();
+}
+
+function applyContinentClasses() {
+  Object.entries(pathElements).forEach(([code, el]) => {
+    el.classList.remove('in-continent','out-of-continent');
+    if (!activeContinent) return;
+    const continent = getCountryContinent(code);
+    el.classList.add(continent === activeContinent ? 'in-continent' : 'out-of-continent');
+  });
+}
+
+function focusContinent(continent) {
+  const features = Object.entries(featureMap)
+    .filter(([code]) => getCountryContinent(code) === continent)
+    .map(([, feature]) => feature);
+
+  if (!features.length) return;
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  features.forEach(feature => {
+    const b = geoPath.bounds(feature);
+    if (!b || !isFinite(b[0][0])) return;
+    minX = Math.min(minX, b[0][0]);
+    minY = Math.min(minY, b[0][1]);
+    maxX = Math.max(maxX, b[1][0]);
+    maxY = Math.max(maxY, b[1][1]);
+  });
+
+  if (!isFinite(minX)) return;
+
+  const width = maxX - minX;
+  const height = maxY - minY;
+  const pad = Math.max(width, height) * 0.12;
+  const viewX = Math.max(0, minX - pad);
+  const viewY = Math.max(0, minY - pad);
+  const viewW = Math.min(1000 - viewX, width + pad * 2);
+  const viewH = Math.min(500 - viewY, height + pad * 2);
+  mapSvg.setAttribute('viewBox', `${viewX} ${viewY} ${viewW} ${viewH}`);
+  refreshMagnifier();
 }
 
 function onCountryClick(alpha2, el, feature) {
@@ -1419,16 +1584,7 @@ function refreshMagnifier() {
 document.getElementById('worldMap').addEventListener('click', e => {
   // If click landed on ocean (not a country path), deselect
   if (e.target === document.getElementById('worldMap') || e.target.tagName === 'rect') {
-    if (selectedCountry && pathElements[selectedCountry]) {
-      pathElements[selectedCountry].classList.remove('selected');
-      const magEl = magSvg.querySelector(`[data-id="${selectedCountry}"]`);
-      if (magEl) magEl.classList.remove('mag-selected');
-    }
-    selectedCountry = null;
-    document.getElementById('magnifier').style.display = 'none';
-    document.getElementById('connectorSvg').style.display = 'none';
-    document.getElementById('panelEmpty').style.display = 'flex';
-    document.getElementById('panelContent').style.display = 'none';
+    clearSelectedCountry();
   }
 });
 
@@ -1669,6 +1825,10 @@ function onSearchKey(e) {
 function selectSearchResult(alpha2) {
   closeSearch();
   document.getElementById('countrySearch').value = countryData[alpha2]?.name || '';
+  const continent = getCountryContinent(alpha2);
+  if (activeContinent && continent && continent !== activeContinent) {
+    setContinentView(continent);
+  }
   // Trigger click on the country
   const el = pathElements[alpha2];
   const feature = featureMap[alpha2];
@@ -1683,6 +1843,9 @@ function closeSearch() {
 // Close dropdown when clicking outside
 document.addEventListener('click', e => {
   if (!e.target.closest('.search-wrap')) closeSearch();
+  if (!e.target.closest('.continent-wrap')) {
+    document.getElementById('continentDropdown')?.classList.remove('open');
+  }
 });
 
 addOcean();
