@@ -27,12 +27,15 @@
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--navy);color:var(--white);font-family:'Barlow Condensed',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
-  header{padding:14px 36px 10px;border-bottom:1px solid rgba(59,130,196,0.2);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;background:var(--header-bg);}
+  header{padding:14px 36px 10px;border-bottom:1px solid rgba(59,130,196,0.2);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:22px;background:var(--header-bg);}
   .header-left h1{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.12em;color:var(--white);}
   .header-left p{font-style:italic;font-size:1rem;font-weight:700;color:var(--panel-text);margin-top:2px;letter-spacing:.03em;}
+  .header-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
+  .header-tools{display:flex;align-items:center;gap:8px;}
   .upload-btn{display:flex;align-items:center;gap:8px;background:rgba(37,99,168,0.2);border:1px solid rgba(91,163,232,0.4);color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:7px 16px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;}
   .upload-btn:hover{background:rgba(37,99,168,0.4);border-color:rgba(91,163,232,0.7);}
   .upload-btn.active{background:rgba(91,163,232,0.3);border-color:rgba(91,163,232,0.75);color:#ffffff;}
+  .icon-btn{width:34px;height:34px;padding:0;justify-content:center;gap:0;}
   .upload-status{font-size:.68rem;color:var(--gold);letter-spacing:.1em;margin-top:4px;text-align:right;min-height:1em;}
   .layout{display:flex;flex:1;overflow:hidden;}
   .map-container{flex:1;position:relative;overflow:hidden;background:linear-gradient(to bottom,var(--ocean-top) 0%,var(--ocean-bottom) 100%);}
@@ -110,8 +113,9 @@
   .pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .pos-btn{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:6px;background:rgba(37,99,168,.2);border:1px solid rgba(91,163,232,.3);color:var(--text-dim);border-radius:3px;cursor:pointer;transition:all .15s;}
   .pos-btn:hover{background:rgba(91,163,232,.3);color:var(--white);}
-  .download-btn{display:flex;align-items:center;gap:7px;background:rgba(200,169,81,0.15);border:1px solid rgba(200,169,81,0.45);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:7px 14px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;}
+  .download-btn{display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(200,169,81,0.15);border:1px solid rgba(200,169,81,0.45);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:7px 14px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;}
   .download-btn:hover{background:rgba(200,169,81,0.3);}
+  .download-btn.icon-btn{padding:0;}
   /* Download modal */
   .dl-modal{background:#0d1e38;border:1px solid rgba(91,163,232,.3);border-radius:6px;padding:26px;width:400px;max-width:95vw;}
   .dl-modal h2{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.15em;margin-bottom:14px;}
@@ -173,6 +177,13 @@
   .continent-badge span{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.12em;color:#ffffff;line-height:1;}
   .continent-reset{background:none;border:none;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;padding:0;}
   .continent-reset:hover{color:#ffffff;}
+  .mag-toggle{display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(37,99,168,0.2);border:1px solid rgba(91,163,232,0.4);border-radius:3px;color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;}
+  .mag-toggle:hover{background:rgba(37,99,168,0.34);border-color:rgba(91,163,232,0.65);}
+  .mag-toggle-track{width:30px;height:16px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.2);position:relative;flex-shrink:0;transition:all .2s;}
+  .mag-toggle-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--text-dim);transition:all .2s;}
+  .mag-toggle.active{color:#ffffff;border-color:rgba(91,163,232,0.75);background:rgba(91,163,232,0.24);}
+  .mag-toggle.active .mag-toggle-track{background:rgba(91,163,232,.48);border-color:rgba(91,163,232,.9);}
+  .mag-toggle.active .mag-toggle-thumb{left:16px;background:#ffffff;}
   .map-container.continent-mode #worldMap .country.out-of-continent{opacity:.12;fill:#25425f;stroke:rgba(120,180,255,.12);}
   .map-container.continent-mode #worldMap .country.in-continent{opacity:1;}
   .map-container.continent-mode #worldMap .country.out-of-continent:hover{fill:#31516f;}
@@ -182,8 +193,9 @@
     .header-left{width:100%;}
     .header-left h1{font-size:1.7rem;}
     .header-left p{font-size:.86rem;}
-    .search-wrap{order:3;max-width:none !important;width:100%;margin:4px 0 0 !important;}
-    .search-input{width:100%;}
+    .header-actions{width:100%;justify-content:flex-start;}
+    .search-wrap{max-width:220px !important;width:auto;margin:0 !important;}
+    .search-input{width:220px;}
     .layout{flex-direction:column;}
     .map-container{min-height:48vh;}
     .side-panel{width:100%;max-height:42vh;border-left:none;border-top:1px solid rgba(59,130,196,.25);}
@@ -211,17 +223,16 @@
     <h1>A House of Prayer</h1>
     <p>Then He taught, saying to them, "Is it not written, 'My house shall be called a house of prayer for all nations'?...Mark 11:17</p>
   </div>
-  <!-- Search bar centered in header -->
-  <div class="search-wrap" data-no-export="true" style="flex:1;max-width:280px;margin:0 20px;">
-    <input class="search-input" id="countrySearch" type="text" placeholder="Search countries…" autocomplete="off"
-      oninput="onSearchInput(this.value)"
-      onkeydown="onSearchKey(event)"
-      onfocus="onSearchFocus()">
-    <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <div class="search-dropdown" id="searchDropdown"></div>
-  </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;" data-no-export="true">
-    <div style="display:flex;gap:8px;">
+  <div class="header-actions" data-no-export="true">
+    <div class="search-wrap" style="max-width:280px;">
+      <input class="search-input" id="countrySearch" type="text" placeholder="Search countries..." autocomplete="off"
+        oninput="onSearchInput(this.value)"
+        onkeydown="onSearchKey(event)"
+        onfocus="onSearchFocus()">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <div class="search-dropdown" id="searchDropdown"></div>
+    </div>
+    <div class="header-tools">
       <div class="continent-wrap">
         <button class="continent-btn" id="continentBtn" onclick="toggleContinentMenu()" title="Choose Continent">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 010 20"/><path d="M12 2a15.3 15.3 0 000 20"/></svg>
@@ -229,20 +240,19 @@
         </button>
         <div class="continent-dropdown" id="continentDropdown"></div>
       </div>
-      <button class="upload-btn" id="settingsBtn" onclick="toggleSettingsModal()" style="padding:7px 10px;" title="Magnifier Settings">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      </button>
-      <button class="upload-btn active" id="magnifierToggleBtn" onclick="toggleMagnifier()" title="Toggle Magnifier">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-        Magnifier
-      </button>
-      <button class="download-btn" onclick="openDownloadModal()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Download
-      </button>
       <button class="upload-btn" onclick="openModal()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Upload Info
+      </button>
+      <button class="download-btn icon-btn" onclick="openDownloadModal()" title="Download">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <button class="mag-toggle active" id="magnifierToggleBtn" onclick="toggleMagnifier()" title="Toggle Magnifier">
+        <span>Mag</span>
+        <span class="mag-toggle-track"><span class="mag-toggle-thumb"></span></span>
+      </button>
+      <button class="upload-btn icon-btn" id="settingsBtn" onclick="toggleSettingsModal()" title="Settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </button>
     </div>
     <div class="upload-status" id="uploadStatus"></div>
@@ -286,13 +296,13 @@
     <div class="pinned-prayers">
       <div class="pinned-card">
         <div class="pinned-card-header">
-          <span class="pinned-flag">🇺🇸</span>
-          <span class="pinned-name">United States</span>
-          <span class="pinned-name" style="font-size:.85rem;color:var(--text-dim);padding:0 4px;">&amp;</span>
-          <span class="pinned-flag">🇮🇱</span>
-          <span class="pinned-name">Israel</span>
+          <span class="pinned-flag" id="pinnedFlagA">🇺🇸</span>
+          <span class="pinned-name" id="pinnedNameA">United States</span>
+          <span class="pinned-name" id="pinnedSeparator" style="font-size:.85rem;color:var(--text-dim);padding:0 4px;">&amp;</span>
+          <span class="pinned-flag" id="pinnedFlagB">🇮🇱</span>
+          <span class="pinned-name" id="pinnedNameB">Israel</span>
         </div>
-        <ol class="pinned-points">
+        <ol class="pinned-points" id="pinnedPoints">
           <li><span class="pinned-num">1.</span><span>Pray for America in its 250th year.</span></li>
           <li><span class="pinned-num">2.</span><span>Pray for our local community.</span></li>
           <li><span class="pinned-num">3.</span><span>Bless Israel &amp; pray for salvation in the land.</span></li>
@@ -407,15 +417,18 @@
   <div class="modal" style="width:580px;">
     <h2>Upload Country Info</h2>
     <p class="modal-desc">Select a country to update its prayer points or correct any information.</p>
-    <label class="modal-label">Country</label>
-    <select class="modal-country-select" id="modalCountrySelect">
-      <option value="">— Select a country —</option>
-    </select>
+    <div id="modalCountryBlock">
+      <label class="modal-label">Country</label>
+      <select class="modal-country-select" id="modalCountrySelect">
+        <option value="">— Select a country —</option>
+      </select>
+    </div>
 
     <!-- Tabs -->
     <div style="display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid rgba(91,163,232,.2);">
       <button id="tabPrayer" onclick="switchTab('prayer')" style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;padding:7px 16px;background:rgba(91,163,232,.2);border:none;border-bottom:2px solid var(--blue-accent);color:var(--white);cursor:pointer;">Prayer Points</button>
       <button id="tabInfo" onclick="switchTab('info')" style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;padding:7px 16px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-dim);cursor:pointer;">Country Info</button>
+      <button id="tabPinned" onclick="switchTab('pinned')" style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;padding:7px 16px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-dim);cursor:pointer;">Singled Out Card</button>
     </div>
 
     <!-- Prayer Points Tab -->
@@ -460,6 +473,30 @@
           <input class="dl-input" id="editLeader" type="text" placeholder="e.g. Benjamin Netanyahu" style="width:100%;text-align:left;">
         </div>
       </div>
+    </div>
+
+    <!-- Singled Out Card Tab -->
+    <div id="panePinned" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label class="modal-label">First Flag</label>
+          <input class="dl-input" id="editPinnedFlagA" type="text" placeholder="e.g. 🇺🇸" style="width:100%;text-align:left;">
+        </div>
+        <div>
+          <label class="modal-label">First Name</label>
+          <input class="dl-input" id="editPinnedNameA" type="text" placeholder="e.g. United States" style="width:100%;text-align:left;">
+        </div>
+        <div>
+          <label class="modal-label">Second Flag</label>
+          <input class="dl-input" id="editPinnedFlagB" type="text" placeholder="e.g. 🇮🇱" style="width:100%;text-align:left;">
+        </div>
+        <div>
+          <label class="modal-label">Second Name</label>
+          <input class="dl-input" id="editPinnedNameB" type="text" placeholder="e.g. Israel" style="width:100%;text-align:left;">
+        </div>
+      </div>
+      <label class="modal-label">Card Prayer Points</label>
+      <textarea class="modal-textarea" id="editPinnedPrayers" placeholder="One prayer per line"></textarea>
     </div>
 
     <div class="modal-actions">
@@ -676,6 +713,18 @@ const countryData = {
 };
 
 const uploadedPrayers = {};
+const DEFAULT_PINNED_CARD = {
+  flagA: '🇺🇸',
+  nameA: 'United States',
+  flagB: '🇮🇱',
+  nameB: 'Israel',
+  prayers: [
+    'Pray for America in its 250th year.',
+    'Pray for our local community.',
+    'Bless Israel & pray for salvation in the land.'
+  ]
+};
+let pinnedCard = { ...DEFAULT_PINNED_CARD, prayers: [...DEFAULT_PINNED_CARD.prayers] };
 
 const numToAlpha2 = {
   4:"AF",8:"AL",10:"AQ",12:"DZ",20:"AD",24:"AO",28:"AG",31:"AZ",32:"AR",36:"AU",40:"AT",
@@ -1396,6 +1445,45 @@ function showPanel(alpha2) {
     .join('');
 }
 
+function loadPinnedCard() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('houseOfPrayerPinnedCard') || 'null');
+    if (saved) {
+      pinnedCard = {
+        ...DEFAULT_PINNED_CARD,
+        ...saved,
+        prayers: Array.isArray(saved.prayers) && saved.prayers.length ? saved.prayers : [...DEFAULT_PINNED_CARD.prayers]
+      };
+    }
+  } catch(e) {
+    pinnedCard = { ...DEFAULT_PINNED_CARD, prayers: [...DEFAULT_PINNED_CARD.prayers] };
+  }
+}
+
+function savePinnedCardToStorage() {
+  try { localStorage.setItem('houseOfPrayerPinnedCard', JSON.stringify(pinnedCard)); } catch(e) {}
+}
+
+function renderPinnedCard() {
+  document.getElementById('pinnedFlagA').textContent = pinnedCard.flagA || '';
+  document.getElementById('pinnedNameA').textContent = pinnedCard.nameA || '';
+  document.getElementById('pinnedFlagB').textContent = pinnedCard.flagB || '';
+  document.getElementById('pinnedNameB').textContent = pinnedCard.nameB || '';
+  document.getElementById('pinnedSeparator').style.display = pinnedCard.nameB || pinnedCard.flagB ? '' : 'none';
+  document.getElementById('pinnedPoints').innerHTML = pinnedCard.prayers
+    .filter(Boolean)
+    .map((p, i) => `<li><span class="pinned-num">${i+1}.</span><span>${p}</span></li>`)
+    .join('');
+}
+
+function populatePinnedFields() {
+  document.getElementById('editPinnedFlagA').value = pinnedCard.flagA || '';
+  document.getElementById('editPinnedNameA').value = pinnedCard.nameA || '';
+  document.getElementById('editPinnedFlagB').value = pinnedCard.flagB || '';
+  document.getElementById('editPinnedNameB').value = pinnedCard.nameB || '';
+  document.getElementById('editPinnedPrayers').value = pinnedCard.prayers.join('\n');
+}
+
 function addOcean() {
   const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
   defs.innerHTML = `<linearGradient id="oceanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -1479,12 +1567,17 @@ function switchTab(tab) {
   activeTab = tab;
   document.getElementById('panePrayer').style.display = tab === 'prayer' ? '' : 'none';
   document.getElementById('paneInfo').style.display   = tab === 'info'   ? '' : 'none';
-  document.getElementById('tabPrayer').style.background = tab === 'prayer' ? 'rgba(91,163,232,.2)' : 'transparent';
-  document.getElementById('tabPrayer').style.borderBottomColor = tab === 'prayer' ? 'var(--blue-accent)' : 'transparent';
-  document.getElementById('tabPrayer').style.color = tab === 'prayer' ? 'var(--white)' : 'var(--text-dim)';
-  document.getElementById('tabInfo').style.background = tab === 'info' ? 'rgba(91,163,232,.2)' : 'transparent';
-  document.getElementById('tabInfo').style.borderBottomColor = tab === 'info' ? 'var(--blue-accent)' : 'transparent';
-  document.getElementById('tabInfo').style.color = tab === 'info' ? 'var(--white)' : 'var(--text-dim)';
+  document.getElementById('panePinned').style.display = tab === 'pinned' ? '' : 'none';
+  document.getElementById('modalCountryBlock').style.display = tab === 'pinned' ? 'none' : '';
+
+  ['Prayer','Info','Pinned'].forEach(name => {
+    const key = name.toLowerCase();
+    const el = document.getElementById('tab' + name);
+    const isActive = key === tab;
+    el.style.background = isActive ? 'rgba(91,163,232,.2)' : 'transparent';
+    el.style.borderBottomColor = isActive ? 'var(--blue-accent)' : 'transparent';
+    el.style.color = isActive ? 'var(--white)' : 'var(--text-dim)';
+  });
 }
 
 function openModal() {
@@ -1495,6 +1588,7 @@ function openModal() {
   document.getElementById('prayerTextarea').value = '';
   document.getElementById('fileName').textContent = 'No file chosen';
   document.getElementById('fileInput').value = '';
+  populatePinnedFields();
   switchTab('prayer');
   document.getElementById('modalOverlay').classList.add('open');
 }
@@ -1516,11 +1610,28 @@ document.getElementById('modalCountrySelect').addEventListener('change', e => {
 
 function saveInfo() {
   const alpha2 = document.getElementById('modalCountrySelect').value;
-  if (!alpha2) { alert('Please select a country.'); return; }
 
   if (activeTab === 'prayer') {
+    if (!alpha2) { alert('Please select a country.'); return; }
     savePrayers();
+  } else if (activeTab === 'pinned') {
+    const prayers = document.getElementById('editPinnedPrayers').value
+      .split('\n').map(l => l.trim()).filter(Boolean);
+    pinnedCard = {
+      flagA: document.getElementById('editPinnedFlagA').value.trim(),
+      nameA: document.getElementById('editPinnedNameA').value.trim(),
+      flagB: document.getElementById('editPinnedFlagB').value.trim(),
+      nameB: document.getElementById('editPinnedNameB').value.trim(),
+      prayers: prayers.length ? prayers : [...DEFAULT_PINNED_CARD.prayers]
+    };
+    renderPinnedCard();
+    savePinnedCardToStorage();
+    const status = document.getElementById('uploadStatus');
+    status.textContent = '✓ Singled out card updated';
+    setTimeout(() => status.textContent = '', 4000);
+    closeModal();
   } else {
+    if (!alpha2) { alert('Please select a country.'); return; }
     // Update country info
     if (!countryData[alpha2]) countryData[alpha2] = {};
     const d = countryData[alpha2];
@@ -1936,6 +2047,8 @@ document.addEventListener('keydown', e => {
   closeModal();
 });
 
+loadPinnedCard();
+renderPinnedCard();
 addOcean();
 loadFallbackMap();
 </script>
