@@ -30,12 +30,28 @@
   header{padding:14px 36px 10px;border-bottom:1px solid rgba(59,130,196,0.2);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:22px;background:var(--header-bg);}
   .header-left h1{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.12em;color:var(--white);}
   .header-left p{font-style:italic;font-size:1rem;font-weight:700;color:var(--panel-text);margin-top:2px;letter-spacing:.03em;}
-  .header-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
-  .header-tools{display:flex;align-items:center;gap:8px;}
+  .header-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;}
+  .header-tools{position:fixed;top:0;right:0;width:290px;height:100vh;background:#0d1e38;border-left:1px solid rgba(91,163,232,.35);box-shadow:-8px 0 32px rgba(0,0,0,.55);z-index:260;display:flex;flex-direction:column;align-items:stretch;gap:9px;padding:18px;transform:translateX(100%);transition:transform .24s ease;}
+  .header-tools.open{transform:translateX(0);}
+  .tools-backdrop{position:fixed;inset:0;background:transparent;z-index:250;display:none;}
+  .tools-backdrop.open{display:block;}
+  .tools-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:4px;border-bottom:1px solid rgba(91,163,232,.22);}
+  .tools-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.16em;color:#ffffff;line-height:1;}
+  .tools-close{background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;line-height:1;padding:2px 4px;}
+  .tools-close:hover{color:#ffffff;}
+  .menu-arrow-btn{width:36px;height:34px;border-radius:3px;border:1px solid rgba(91,163,232,.45);background:rgba(91,163,232,.16);color:var(--blue-accent);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;}
+  .menu-arrow-btn:hover,.menu-arrow-btn.active{background:rgba(91,163,232,.3);border-color:rgba(91,163,232,.75);color:#ffffff;}
+  .menu-arrow-btn svg{transition:transform .2s ease;}
+  .menu-arrow-btn.active svg{transform:rotate(180deg);}
   .upload-btn{display:flex;align-items:center;gap:8px;background:rgba(37,99,168,0.2);border:1px solid rgba(91,163,232,0.4);color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:7px 16px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;}
   .upload-btn:hover{background:rgba(37,99,168,0.4);border-color:rgba(91,163,232,0.7);}
   .upload-btn.active{background:rgba(91,163,232,0.3);border-color:rgba(91,163,232,0.75);color:#ffffff;}
   .icon-btn{width:34px;height:34px;padding:0;justify-content:center;gap:0;}
+  .header-tools .upload-btn,.header-tools .download-btn,.header-tools .continent-btn,.header-tools .mag-toggle{width:100%;height:auto;min-height:36px;justify-content:flex-start;padding:9px 12px;}
+  .header-tools .icon-btn{width:100%;justify-content:flex-start;gap:8px;}
+  .header-tools .icon-btn::after{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;}
+  .header-tools #settingsBtn::after{content:'Settings';}
+  .header-tools .download-btn::after{content:'Download';}
   .upload-status{font-size:.68rem;color:var(--gold);letter-spacing:.1em;margin-top:4px;text-align:right;min-height:1em;}
   .layout{display:flex;flex:1;overflow:hidden;}
   .map-container{flex:1;position:relative;overflow:hidden;background:linear-gradient(to bottom,var(--ocean-top) 0%,var(--ocean-bottom) 100%);}
@@ -136,6 +152,10 @@
   .modal h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.15em;margin-bottom:6px;}
   .modal-desc{font-size:.77rem;color:var(--text-dim);margin-bottom:18px;line-height:1.65;}
   .modal-desc code{background:rgba(255,255,255,.09);padding:1px 5px;border-radius:3px;font-size:.73rem;}
+  .support-list{display:flex;flex-direction:column;gap:10px;margin:16px 0 20px;}
+  .support-item{border:1px solid rgba(91,163,232,.22);background:rgba(37,99,168,.14);border-radius:4px;padding:11px 12px;}
+  .support-item h3{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.12em;color:var(--white);margin-bottom:4px;}
+  .support-item p{font-size:.78rem;line-height:1.45;color:var(--text-dim);letter-spacing:.03em;}
   .modal-label{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:5px;display:block;}
   .modal-country-select{width:100%;background:rgba(0,0,0,.35);border:1px solid rgba(91,163,232,.3);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:.88rem;padding:8px 10px;border-radius:4px;margin-bottom:14px;}
   .modal-file-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;}
@@ -168,6 +188,7 @@
   .continent-btn{display:flex;align-items:center;gap:7px;background:rgba(91,163,232,.14);border:1px solid rgba(91,163,232,.38);color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:7px 12px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;}
   .continent-btn:hover,.continent-btn.active{background:rgba(91,163,232,.28);border-color:rgba(91,163,232,.7);color:var(--white);}
   .continent-dropdown{position:absolute;top:calc(100% + 5px);right:0;width:190px;background:#0d1e38;border:1px solid rgba(91,163,232,.35);border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.65);z-index:320;display:none;overflow:hidden;}
+  .header-tools .continent-dropdown{position:static;width:100%;box-shadow:none;margin-top:5px;}
   .continent-dropdown.open{display:block;}
   .continent-item{width:100%;border:none;border-bottom:1px solid rgba(59,130,196,.14);background:transparent;color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;text-align:left;padding:9px 12px;cursor:pointer;}
   .continent-item:last-child{border-bottom:none;}
@@ -232,7 +253,15 @@
       <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <div class="search-dropdown" id="searchDropdown"></div>
     </div>
-    <div class="header-tools">
+    <button class="menu-arrow-btn" id="toolsBtn" onclick="toggleToolsMenu()" title="Open Menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="tools-backdrop" id="toolsBackdrop" onclick="closeToolsMenu()"></div>
+    <div class="header-tools" id="headerTools">
+      <div class="tools-header">
+        <span class="tools-title">Tools</span>
+        <button class="tools-close" onclick="closeToolsMenu()">✕</button>
+      </div>
       <div class="continent-wrap">
         <button class="continent-btn" id="continentBtn" onclick="toggleContinentMenu()" title="Choose Continent">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 010 20"/><path d="M12 2a15.3 15.3 0 000 20"/></svg>
@@ -250,6 +279,10 @@
       <button class="mag-toggle active" id="magnifierToggleBtn" onclick="toggleMagnifier()" title="Toggle Magnifier">
         <span>Mag</span>
         <span class="mag-toggle-track"><span class="mag-toggle-thumb"></span></span>
+      </button>
+      <button class="upload-btn" id="supportBtn" onclick="openSupportModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 115.8 1c-.8 1.2-2.2 1.5-2.7 2.7"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Support / Info
       </button>
       <button class="upload-btn icon-btn" id="settingsBtn" onclick="toggleSettingsModal()" title="Settings">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -502,6 +535,31 @@
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary" id="saveInfoBtn" onclick="saveInfo()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Support / Info Modal -->
+<div class="modal-overlay" id="supportModalOverlay" onclick="supportOverlayClick(event)">
+  <div class="modal" style="width:520px;">
+    <h2>Support / Info</h2>
+    <p class="modal-desc">A quick place for questions, notes, and presentation support.</p>
+    <div class="support-list">
+      <div class="support-item">
+        <h3>Questions</h3>
+        <p>Contact your ministry or media team for help updating countries, prayer points, or presentation details.</p>
+      </div>
+      <div class="support-item">
+        <h3>Saved Info</h3>
+        <p>Custom prayer points, country edits, color presets, and singled out card changes are saved in this browser.</p>
+      </div>
+      <div class="support-item">
+        <h3>Downloads</h3>
+        <p>Use the download tool after selecting a country and choosing the map view you want to share.</p>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeSupportModal()">Close</button>
     </div>
   </div>
 </div>
@@ -917,6 +975,27 @@ function renderContinentMenu() {
   ).join('');
 }
 
+function openToolsMenu() {
+  document.getElementById('headerTools')?.classList.add('open');
+  document.getElementById('toolsBackdrop')?.classList.add('open');
+  document.getElementById('toolsBtn')?.classList.add('active');
+}
+
+function closeToolsMenu() {
+  document.getElementById('headerTools')?.classList.remove('open');
+  document.getElementById('toolsBackdrop')?.classList.remove('open');
+  document.getElementById('toolsBtn')?.classList.remove('active');
+  document.getElementById('continentDropdown')?.classList.remove('open');
+}
+
+function toggleToolsMenu() {
+  if (document.getElementById('headerTools')?.classList.contains('open')) {
+    closeToolsMenu();
+  } else {
+    openToolsMenu();
+  }
+}
+
 function toggleContinentMenu() {
   document.getElementById('continentDropdown')?.classList.toggle('open');
 }
@@ -967,6 +1046,7 @@ function setContinentView(continent) {
   applyContinentClasses();
   focusContinent(continent);
   renderContinentMenu();
+  closeToolsMenu();
 }
 
 function clearContinentView() {
@@ -1533,6 +1613,19 @@ function overlayClick(e) {
   if (e.target === document.getElementById('modalOverlay')) closeModal();
 }
 
+function openSupportModal() {
+  closeToolsMenu();
+  document.getElementById('supportModalOverlay')?.classList.add('open');
+}
+
+function closeSupportModal() {
+  document.getElementById('supportModalOverlay')?.classList.remove('open');
+}
+
+function supportOverlayClick(e) {
+  if (e.target === document.getElementById('supportModalOverlay')) closeSupportModal();
+}
+
 function handleFileUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -1581,6 +1674,7 @@ function switchTab(tab) {
 }
 
 function openModal() {
+  closeToolsMenu();
   if (selectedCountry) {
     document.getElementById('modalCountrySelect').value = selectedCountry;
     populateInfoFields(selectedCountry);
@@ -1654,9 +1748,11 @@ function saveInfo() {
   }
 }
 function toggleSettingsModal() {
+  closeToolsMenu();
   document.getElementById('settingsOverlay').classList.toggle('open');
 }
 function openSettingsModal() {
+  closeToolsMenu();
   document.getElementById('settingsOverlay').classList.add('open');
 }
 function closeSettingsModal() {
@@ -2026,6 +2122,7 @@ document.addEventListener('click', e => {
   }
   if (e.target === document.getElementById('dlModalOverlay')) closeDlModal();
   if (e.target === document.getElementById('modalOverlay')) closeModal();
+  if (e.target === document.getElementById('supportModalOverlay')) closeSupportModal();
 });
 
 document.addEventListener('pointerdown', e => {
@@ -2041,10 +2138,12 @@ document.addEventListener('pointerdown', e => {
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   closeSearch();
+  closeToolsMenu();
   document.getElementById('continentDropdown')?.classList.remove('open');
   closeSettingsModal();
   closeDlModal();
   closeModal();
+  closeSupportModal();
 });
 
 loadPinnedCard();
@@ -2194,6 +2293,9 @@ function captureExportCanvas(w, h, scaleOverride) {
     document.getElementById('dlModalOverlay'),
     document.getElementById('settingsOverlay'),
     document.getElementById('modalOverlay'),
+    document.getElementById('supportModalOverlay'),
+    document.getElementById('toolsBackdrop'),
+    document.getElementById('headerTools'),
   ].filter(Boolean);
   const savedVis = hideEls.map(el => ({ el, v: el.style.visibility }));
   hideEls.forEach(el => el.style.visibility = 'hidden');
@@ -2266,6 +2368,7 @@ function paintPreview(snapshot, w, h) {
 }
 
 function openDownloadModal() {
+  closeToolsMenu();
   loadHtml2Canvas(() => {
     const { w, h } = getDlSize();
     captureExportCanvas(w, h, Math.min(1, 580 / getExportViewport(w, h).width)).then(snapshot => {
