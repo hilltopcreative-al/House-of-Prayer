@@ -2202,12 +2202,15 @@ function getDlSize() {
 }
 
 function getExportViewport(w, h) {
-  const baseHeight = 1080;
-  const virtualWidth = Math.max(400, Math.round(baseHeight * (w / h)));
+  const maxLayoutWidth = 1920;
+  const maxLayoutHeight = 1080;
+  const layoutScale = Math.max(1, Math.min(w / maxLayoutWidth, h / maxLayoutHeight));
+  const layoutWidth = Math.round(w / layoutScale);
+  const layoutHeight = Math.round(h / layoutScale);
   return {
-    width: virtualWidth,
-    height: baseHeight,
-    scale: h / baseHeight
+    width: layoutWidth,
+    height: layoutHeight,
+    scale: layoutScale
   };
 }
 
