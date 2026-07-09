@@ -149,6 +149,20 @@
   .support-item{border:1px solid rgba(91,163,232,.22);background:rgba(37,99,168,.14);border-radius:4px;padding:11px 12px;}
   .support-item h3{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.12em;color:var(--white);margin-bottom:4px;}
   .support-item p{font-size:.78rem;line-height:1.45;color:var(--text-dim);letter-spacing:.03em;}
+  .modal-close-x{position:absolute;top:12px;right:12px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.22);border:1px solid rgba(91,163,232,.32);border-radius:3px;color:var(--text-dim);font-size:1rem;line-height:1;cursor:pointer;transition:all .2s;}
+  .modal-close-x:hover{color:var(--white);border-color:rgba(91,163,232,.7);background:rgba(37,99,168,.35);}
+  .support-modal{position:relative;width:520px;}
+  .support-form{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+  .modal-input{width:100%;height:38px;background:rgba(0,0,0,.3);border:1px solid rgba(91,163,232,.3);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:.9rem;padding:0 10px;border-radius:4px;letter-spacing:.03em;outline:none;}
+  .modal-input:focus,.modal-textarea:focus{border-color:rgba(91,163,232,.72);}
+  .support-message{height:180px;margin-bottom:0;}
+  .support-count{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(127,163,200,.62);text-align:right;margin-top:-6px;}
+  .support-status{min-height:1em;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-align:right;}
+  .info-modal{width:860px;max-width:95vw;}
+  .info-grid{display:grid;grid-template-columns:minmax(260px,1fr) minmax(290px,1.15fr);gap:18px;align-items:stretch;}
+  .info-story{border-left:1px solid rgba(200,169,81,.35);padding-left:18px;color:var(--text-dim);font-size:.8rem;line-height:1.55;letter-spacing:.03em;}
+  .info-story h3{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:.13em;color:var(--white);margin-bottom:8px;}
+  .info-story p{margin-bottom:10px;}
   .modal-label{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:5px;display:block;}
   .modal-country-select{width:100%;background:rgba(0,0,0,.35);border:1px solid rgba(91,163,232,.3);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:.88rem;padding:8px 10px;border-radius:4px;margin-bottom:14px;}
   .modal-file-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;}
@@ -211,6 +225,8 @@
     .search-wrap{max-width:220px !important;width:auto;margin:0 !important;}
     .search-input{width:220px;}
     .floating-actions{right:16px;bottom:10px;width:calc(100vw - 32px);}
+    .info-grid{grid-template-columns:1fr;}
+    .info-story{border-left:none;border-top:1px solid rgba(200,169,81,.35);padding-left:0;padding-top:16px;}
     .layout{flex-direction:column;}
     .map-container{min-height:48vh;}
     .side-panel{width:100%;max-height:42vh;border-left:none;border-top:1px solid rgba(59,130,196,.25);}
@@ -538,39 +554,59 @@
 </div>
 
 <!-- Support Modal -->
-<div class="modal-overlay" id="supportModalOverlay" onclick="supportOverlayClick(event)">
-  <div class="modal" style="width:520px;">
+<div class="modal-overlay" id="supportModalOverlay">
+  <div class="modal support-modal">
+    <button class="modal-close-x" type="button" aria-label="Close support form" onclick="closeSupportModal()">×</button>
     <h2>Support</h2>
-    <p class="modal-desc">A quick place for questions, notes, and presentation support.</p>
-    <div class="support-list">
-      <div class="support-item">
-        <h3>Questions</h3>
-        <p>Contact your ministry or media team for help updating countries, prayer points, or presentation details.</p>
+    <p class="modal-desc">Send a question or note to hello@hilltopcrtv.com.</p>
+    <form class="support-form" id="supportForm" onsubmit="sendSupportEmail(event)">
+      <div>
+        <label class="modal-label" for="supportName">Name</label>
+        <input class="modal-input" id="supportName" name="name" type="text" autocomplete="name" required>
       </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" onclick="closeSupportModal()">Close</button>
-    </div>
+      <div>
+        <label class="modal-label" for="supportEmail">Email</label>
+        <input class="modal-input" id="supportEmail" name="email" type="email" autocomplete="email" required>
+      </div>
+      <div>
+        <label class="modal-label" for="supportMessage">Message</label>
+        <textarea class="modal-textarea support-message" id="supportMessage" name="message" maxlength="1000" required oninput="updateSupportCount()" placeholder="How can we help?"></textarea>
+      </div>
+      <div class="support-count" id="supportCount">0 / 1000</div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" type="submit">Send</button>
+      </div>
+      <div class="support-status" id="supportStatus" aria-live="polite"></div>
+    </form>
   </div>
 </div>
 
 <!-- Info Modal -->
 <div class="modal-overlay" id="infoModalOverlay" onclick="infoOverlayClick(event)">
-  <div class="modal" style="width:520px;">
+  <div class="modal info-modal">
     <h2>Info</h2>
     <p class="modal-desc">Project notes, local browser details, and usage boundaries.</p>
-    <div class="support-list">
-      <div class="support-item">
-        <h3>App &amp; Data</h3>
-        <p>The app build and underlying country/prayer data are © 2026 hilltopcrtv. All rights reserved.</p>
+    <div class="info-grid">
+      <div class="support-list">
+        <div class="support-item">
+          <h3>App &amp; Data</h3>
+          <p>The app build and underlying country/prayer data are © 2026 hilltopcrtv. All rights reserved.</p>
+        </div>
+        <div class="support-item">
+          <h3>Saved Info</h3>
+          <p>Custom prayer points, country edits, color presets, and singled out card changes are saved in this browser.</p>
+        </div>
+        <div class="support-item">
+          <h3>Downloads</h3>
+          <p>Downloaded map images are intended for prayer, presentation, and sharing use.</p>
+        </div>
       </div>
-      <div class="support-item">
-        <h3>Saved Info</h3>
-        <p>Custom prayer points, country edits, color presets, and singled out card changes are saved in this browser.</p>
-      </div>
-      <div class="support-item">
-        <h3>Downloads</h3>
-        <p>Downloaded map images are intended for prayer, presentation, and sharing use.</p>
+      <div class="info-story">
+        <h3>Hello and welcome to The World Prayer Map.</h3>
+        <p>This project started as an internal tool to help our church creative team design prayer graphics more efficiently. Over time, it grew into an interactive resource for creating country-specific prayer points and visuals.</p>
+        <p>In 2024, our church began praying over one nation each week, and we recently completed our 90th nation. Through that process, we saw the need for a simple, organized tool that could help churches focus their prayers, build awareness, and create resources that support intentional prayer for the nations.</p>
+        <p>The World Prayer Map is designed for churches, prayer teams, missions teams, small groups, classrooms, and creative teams who want a clear and practical way to pray for countries around the world.</p>
+        <p>The goal is simple: to help the church pray with greater focus, consistency, and understanding as we intercede for the nations.</p>
       </div>
     </div>
     <div class="modal-actions">
@@ -1651,6 +1687,9 @@ function overlayClick(e) {
 
 function openSupportModal() {
   closeToolsMenu();
+  updateSupportCount();
+  const status = document.getElementById('supportStatus');
+  if (status) status.textContent = '';
   document.getElementById('supportModalOverlay')?.classList.add('open');
 }
 
@@ -1658,8 +1697,32 @@ function closeSupportModal() {
   document.getElementById('supportModalOverlay')?.classList.remove('open');
 }
 
-function supportOverlayClick(e) {
-  if (e.target === document.getElementById('supportModalOverlay')) closeSupportModal();
+function updateSupportCount() {
+  const message = document.getElementById('supportMessage');
+  const count = document.getElementById('supportCount');
+  if (!message || !count) return;
+  count.textContent = `${message.value.length} / 1000`;
+}
+
+function sendSupportEmail(e) {
+  e.preventDefault();
+  const name = document.getElementById('supportName')?.value.trim() || '';
+  const email = document.getElementById('supportEmail')?.value.trim() || '';
+  const message = document.getElementById('supportMessage')?.value.trim() || '';
+  const status = document.getElementById('supportStatus');
+  if (!name || !email || !message) {
+    if (status) status.textContent = 'Please complete all fields.';
+    return;
+  }
+  const subject = 'World Prayer Map Support';
+  const body = [
+    `Name: ${name}`,
+    `Email: ${email}`,
+    '',
+    message
+  ].join('\n');
+  window.location.href = `mailto:hello@hilltopcrtv.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  if (status) status.textContent = 'Opening your email app...';
 }
 
 function openInfoModal() {
@@ -2172,7 +2235,6 @@ document.addEventListener('click', e => {
   }
   if (e.target === document.getElementById('dlModalOverlay')) closeDlModal();
   if (e.target === document.getElementById('modalOverlay')) closeModal();
-  if (e.target === document.getElementById('supportModalOverlay')) closeSupportModal();
   if (e.target === document.getElementById('infoModalOverlay')) closeInfoModal();
 });
 
@@ -2194,7 +2256,6 @@ document.addEventListener('keydown', e => {
   closeSettingsModal();
   closeDlModal();
   closeModal();
-  closeSupportModal();
   closeInfoModal();
 });
 
