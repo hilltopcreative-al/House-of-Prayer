@@ -199,8 +199,7 @@
   .map-container.continent-mode #worldMap .country.out-of-continent{opacity:.12;fill:#25425f;stroke:rgba(120,180,255,.12);}
   .map-container.continent-mode #worldMap .country.in-continent{opacity:1;}
   .map-container.continent-mode #worldMap .country.territory-hidden{display:none;}
-  .map-container.antarctica-mode{background:var(--ocean-bottom);}
-  .map-container.antarctica-mode #mainOceanRect{fill:var(--ocean-bottom);}
+  .map-container.continent-mode #mainOceanRect{fill:transparent;}
   .map-container.continent-mode #worldMap .country.out-of-continent:hover{fill:#31516f;}
   #worldMap .country{transition:fill .2s,opacity .2s;}
   @media (max-width: 980px) {
@@ -1075,7 +1074,6 @@ function setContinentView(continent) {
   if (badgeName) badgeName.textContent = continent;
   badge?.classList.add('open');
   mapContainer.classList.add('continent-mode');
-  mapContainer.classList.toggle('antarctica-mode', continent === 'Antarctica');
   applyContinentClasses();
   focusContinent(continent);
   renderContinentMenu();
@@ -1085,7 +1083,7 @@ function setContinentView(continent) {
 function clearContinentView() {
   activeContinent = null;
   mapSvg.setAttribute('viewBox', '0 0 1000 500');
-  mapContainer.classList.remove('continent-mode','antarctica-mode');
+  mapContainer.classList.remove('continent-mode');
   document.getElementById('continentBadge')?.classList.remove('open');
   document.getElementById('continentBtn')?.classList.remove('active');
   const label = document.getElementById('continentBtnLabel');
