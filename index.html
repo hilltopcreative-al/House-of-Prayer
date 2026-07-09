@@ -37,11 +37,11 @@
   .upload-btn:hover{background:rgba(37,99,168,0.4);border-color:rgba(91,163,232,0.7);}
   .upload-btn.active{background:rgba(91,163,232,0.3);border-color:rgba(91,163,232,0.75);color:#ffffff;}
   .icon-btn{width:var(--header-control-h);height:var(--header-control-h);padding:0;justify-content:center;gap:0;}
-  .floating-actions{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
-  .floating-copyright{font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(127,163,200,.62);text-shadow:0 2px 10px rgba(0,0,0,.8);pointer-events:none;}
-  .floating-button-row{display:flex;gap:7px;}
-  .support-float-btn{height:var(--header-control-h);padding:0 12px;background:rgba(13,30,56,.92);border-color:rgba(200,169,81,.6);color:var(--gold);box-shadow:0 8px 28px rgba(0,0,0,.45);}
-  .support-float-btn:hover{background:rgba(26,58,96,.95);border-color:rgba(200,169,81,.9);}
+  .floating-actions{position:fixed;right:24px;bottom:12px;width:372px;z-index:80;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 8px;background:linear-gradient(90deg,transparent,rgba(26,58,96,.72) 18%,rgba(26,58,96,.72) 82%,transparent);}
+  .floating-copyright{order:2;font-size:.56rem;letter-spacing:.09em;text-transform:uppercase;color:rgba(127,163,200,.5);text-shadow:0 2px 10px rgba(0,0,0,.65);pointer-events:none;text-align:center;}
+  .floating-button-row{order:1;display:flex;justify-content:center;gap:7px;}
+  .support-float-btn{height:28px;min-width:94px;padding:0 12px;background:rgba(0,36,66,.46);border-color:rgba(91,163,232,.42);color:#b9d8ee;box-shadow:none;font-size:.62rem;letter-spacing:.18em;}
+  .support-float-btn:hover{background:rgba(37,99,168,.28);border-color:rgba(91,163,232,.65);color:#e8eef5;}
   .upload-status{font-size:.68rem;color:var(--gold);letter-spacing:.1em;margin-top:4px;text-align:right;min-height:1em;}
   .layout{display:flex;flex:1;overflow:hidden;}
   .map-container{flex:1;position:relative;overflow:hidden;background:linear-gradient(to bottom,var(--ocean-top) 0%,var(--ocean-bottom) 100%);}
@@ -211,6 +211,7 @@
     .header-actions{width:100%;justify-content:flex-start;}
     .search-wrap{max-width:220px !important;width:auto;margin:0 !important;}
     .search-input{width:220px;}
+    .floating-actions{right:16px;bottom:10px;width:calc(100vw - 32px);}
     .layout{flex-direction:column;}
     .map-container{min-height:48vh;}
     .side-panel{width:100%;max-height:42vh;border-left:none;border-top:1px solid rgba(59,130,196,.25);}
