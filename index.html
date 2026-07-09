@@ -1008,6 +1008,7 @@ function buildD3Map(world) {
 }
 
 function getDisplayFeature(alpha2, feature) {
+  if (alpha2 === 'US') return trimUsAntimeridianFragments(feature);
   if (!MAINLAND_ONLY_CODES.has(alpha2)) return feature;
   const geom = feature.geometry;
   if (!geom || geom.type !== 'MultiPolygon' || !Array.isArray(geom.coordinates)) return feature;
@@ -1029,6 +1030,22 @@ function getDisplayFeature(alpha2, feature) {
   return {
     ...feature,
     geometry: { type:'MultiPolygon', coordinates:[bestPolygon] }
+  };
+}
+
+function trimUsAntimeridianFragments(feature) {
+  const geom = feature.geometry;
+  if (!geom || geom.type !== 'MultiPolygon' || !Array.isArray(geom.coordinates)) return feature;
+  const coordinates = geom.coordinates.filter(polygon => {
+    const outerRing = polygon[0] || [];
+    if (!outerRing.length) return false;
+    const avgLon = outerRing.reduce((sum, point) => sum + point[0], 0) / outerRing.length;
+    return avgLon <= 0;
+  });
+  if (!coordinates.length) return feature;
+  return {
+    ...feature,
+    geometry: { type:'MultiPolygon', coordinates }
   };
 }
 
