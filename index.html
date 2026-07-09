@@ -24,6 +24,7 @@
     --panel-text-dim:#7fa3c8;
     --country-stroke:rgba(120,180,255,.35);
     --map-stroke-width:.5;
+    --header-control-h:34px;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--navy);color:var(--white);font-family:'Barlow Condensed',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
@@ -32,10 +33,12 @@
   .header-left p{font-style:italic;font-size:1rem;font-weight:700;color:var(--panel-text);margin-top:2px;letter-spacing:.03em;}
   .header-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
   .header-tools{display:flex;align-items:center;gap:8px;}
-  .upload-btn{display:flex;align-items:center;gap:8px;background:rgba(37,99,168,0.2);border:1px solid rgba(91,163,232,0.4);color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:7px 16px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;}
+  .upload-btn{height:var(--header-control-h);display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(37,99,168,0.2);border:1px solid rgba(91,163,232,0.4);color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:0 16px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;line-height:1;}
   .upload-btn:hover{background:rgba(37,99,168,0.4);border-color:rgba(91,163,232,0.7);}
   .upload-btn.active{background:rgba(91,163,232,0.3);border-color:rgba(91,163,232,0.75);color:#ffffff;}
-  .icon-btn{width:34px;height:34px;padding:0;justify-content:center;gap:0;}
+  .icon-btn{width:var(--header-control-h);height:var(--header-control-h);padding:0;justify-content:center;gap:0;}
+  .support-float-btn{position:fixed;right:18px;bottom:18px;z-index:80;height:var(--header-control-h);padding:0 14px;background:rgba(13,30,56,.92);border-color:rgba(200,169,81,.6);color:var(--gold);box-shadow:0 8px 28px rgba(0,0,0,.45);}
+  .support-float-btn:hover{background:rgba(26,58,96,.95);border-color:rgba(200,169,81,.9);}
   .upload-status{font-size:.68rem;color:var(--gold);letter-spacing:.1em;margin-top:4px;text-align:right;min-height:1em;}
   .layout{display:flex;flex:1;overflow:hidden;}
   .map-container{flex:1;position:relative;overflow:hidden;background:linear-gradient(to bottom,var(--ocean-top) 0%,var(--ocean-bottom) 100%);}
@@ -108,12 +111,14 @@
   .settings-hint{font-size:.6rem;color:rgba(127,163,200,.6);letter-spacing:.02em;line-height:1.4;}
   .settings-divider{height:1px;background:rgba(59,130,196,.2);margin:4px 0 16px;}
   .settings-section{font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.2em;color:var(--gold);margin-bottom:10px;}
+  .settings-section-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+  .settings-section-row .settings-section{margin-bottom:0;}
   .settings-reset{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;margin-top:auto;padding-top:12px;}
   .settings-reset:hover{color:var(--white);}
   .pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .pos-btn{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:6px;background:rgba(37,99,168,.2);border:1px solid rgba(91,163,232,.3);color:var(--text-dim);border-radius:3px;cursor:pointer;transition:all .15s;}
   .pos-btn:hover{background:rgba(91,163,232,.3);color:var(--white);}
-  .download-btn{display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(200,169,81,0.15);border:1px solid rgba(200,169,81,0.45);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:7px 14px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;}
+  .download-btn{height:var(--header-control-h);display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(200,169,81,0.15);border:1px solid rgba(200,169,81,0.45);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:0 14px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;line-height:1;}
   .download-btn:hover{background:rgba(200,169,81,0.3);}
   .download-btn.icon-btn{padding:0;}
   /* Download modal */
@@ -156,7 +161,7 @@
   .btn-secondary:hover{border-color:rgba(91,163,232,.6);color:var(--white);}
   /* Search bar */
   .search-wrap{position:relative;display:flex;align-items:center;}
-  .search-input{background:rgba(0,0,0,.35);border:1px solid rgba(91,163,232,.3);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:.88rem;padding:7px 34px 7px 12px;border-radius:4px;width:220px;letter-spacing:.03em;outline:none;transition:border-color .2s;}
+  .search-input{height:var(--header-control-h);background:rgba(0,0,0,.35);border:1px solid rgba(91,163,232,.3);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:.88rem;padding:0 34px 0 12px;border-radius:4px;width:220px;letter-spacing:.03em;outline:none;transition:border-color .2s;}
   .search-input:focus{border-color:rgba(91,163,232,.7);}
   .search-input::placeholder{color:rgba(127,163,200,.45);}
   .search-icon{position:absolute;right:10px;color:var(--text-dim);pointer-events:none;}
@@ -169,10 +174,9 @@
   .search-no-results{padding:10px 12px;font-size:.78rem;color:var(--text-dim);font-style:italic;}
   /* Continent view */
   .continent-wrap{position:relative;}
-  .continent-btn{display:flex;align-items:center;gap:7px;background:rgba(91,163,232,.14);border:1px solid rgba(91,163,232,.38);color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:7px 12px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;}
+  .continent-btn{height:var(--header-control-h);display:flex;align-items:center;gap:7px;background:rgba(91,163,232,.14);border:1px solid rgba(91,163,232,.38);color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:0 12px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;line-height:1;}
   .continent-btn:hover,.continent-btn.active{background:rgba(91,163,232,.28);border-color:rgba(91,163,232,.7);color:var(--white);}
-  .continent-dropdown{position:absolute;top:calc(100% + 5px);right:0;width:190px;background:#0d1e38;border:1px solid rgba(91,163,232,.35);border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.65);z-index:320;display:none;overflow:hidden;}
-  .header-tools .continent-dropdown{position:static;width:100%;box-shadow:none;margin-top:5px;}
+  .continent-dropdown{position:absolute;top:calc(100% + 5px);left:0;width:190px;background:#0d1e38;border:1px solid rgba(91,163,232,.35);border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.65);z-index:320;display:none;overflow:hidden;}
   .continent-dropdown.open{display:block;}
   .continent-item{width:100%;border:none;border-bottom:1px solid rgba(59,130,196,.14);background:transparent;color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;text-align:left;padding:9px 12px;cursor:pointer;}
   .continent-item:last-child{border-bottom:none;}
@@ -182,13 +186,13 @@
   .continent-badge span{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.12em;color:#ffffff;line-height:1;}
   .continent-reset{background:none;border:none;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;padding:0;}
   .continent-reset:hover{color:#ffffff;}
-  .mag-toggle{display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(37,99,168,0.2);border:1px solid rgba(91,163,232,0.4);border-radius:3px;color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;}
-  .mag-toggle:hover{background:rgba(37,99,168,0.34);border-color:rgba(91,163,232,0.65);}
-  .mag-toggle-track{width:30px;height:16px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.2);position:relative;flex-shrink:0;transition:all .2s;}
-  .mag-toggle-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--text-dim);transition:all .2s;}
-  .mag-toggle.active{color:#ffffff;border-color:rgba(91,163,232,0.75);background:rgba(91,163,232,0.24);}
-  .mag-toggle.active .mag-toggle-track{background:rgba(91,163,232,.48);border-color:rgba(91,163,232,.9);}
-  .mag-toggle.active .mag-toggle-thumb{left:16px;background:#ffffff;}
+  .mag-toggle{height:28px;display:flex;align-items:center;gap:8px;padding:0 8px;background:rgba(200,169,81,0.08);border:1px solid rgba(200,169,81,0.28);border-radius:3px;color:rgba(200,169,81,.55);font-family:'Barlow Condensed',sans-serif;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;line-height:1;}
+  .mag-toggle:hover{background:rgba(200,169,81,0.14);border-color:rgba(200,169,81,0.45);}
+  .mag-toggle-track{width:30px;height:16px;border-radius:999px;background:rgba(127,163,200,.18);border:1px solid rgba(127,163,200,.28);position:relative;flex-shrink:0;transition:all .2s;}
+  .mag-toggle-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:rgba(127,163,200,.65);transition:all .2s;}
+  .mag-toggle.active{color:var(--gold);border-color:rgba(200,169,81,0.68);background:rgba(200,169,81,0.16);}
+  .mag-toggle.active .mag-toggle-track{background:rgba(200,169,81,.55);border-color:rgba(200,169,81,.9);}
+  .mag-toggle.active .mag-toggle-thumb{left:16px;background:#ffe6a3;}
   .map-container.continent-mode #worldMap .country.out-of-continent{opacity:.12;fill:#25425f;stroke:rgba(120,180,255,.12);}
   .map-container.continent-mode #worldMap .country.in-continent{opacity:1;}
   .map-container.continent-mode #worldMap .country.out-of-continent:hover{fill:#31516f;}
@@ -247,18 +251,10 @@
       </div>
       <button class="upload-btn" onclick="openModal()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Upload Info
+        Upload
       </button>
       <button class="download-btn icon-btn" onclick="openDownloadModal()" title="Download">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      </button>
-      <button class="mag-toggle active" id="magnifierToggleBtn" onclick="toggleMagnifier()" title="Toggle Magnifier">
-        <span>Mag</span>
-        <span class="mag-toggle-track"><span class="mag-toggle-thumb"></span></span>
-      </button>
-      <button class="upload-btn" id="supportBtn" onclick="openSupportModal()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 115.8 1c-.8 1.2-2.2 1.5-2.7 2.7"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Support / Info
       </button>
       <button class="upload-btn icon-btn" id="settingsBtn" onclick="toggleSettingsModal()" title="Settings">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -321,12 +317,23 @@
   </div>
 </div>
 
+<button class="upload-btn support-float-btn" id="supportBtn" onclick="openSupportModal()" data-no-export="true">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 115.8 1c-.8 1.2-2.2 1.5-2.7 2.7"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  Support / Info
+</button>
+
 <!-- Settings Panel (left side, no overlay dim) -->
 <div id="settingsOverlay" onclick="settingsOverlayClick(event)">
   <div class="settings-modal">
     <h2>Settings <button class="settings-close-btn" onclick="closeSettingsModal()">✕</button></h2>
 
-    <div class="settings-section">Magnifier</div>
+    <div class="settings-section-row">
+      <div class="settings-section">Magnifier</div>
+      <button class="mag-toggle active" id="magnifierToggleBtn" onclick="toggleMagnifier()" title="Toggle Magnifier">
+        <span id="magnifierToggleText">On</span>
+        <span class="mag-toggle-track"><span class="mag-toggle-thumb"></span></span>
+      </button>
+    </div>
 
     <div class="settings-row">
       <label class="settings-label">Zoom Level <span id="zoomLabel">1.0×</span></label>
@@ -981,6 +988,8 @@ function toggleMagnifier() {
   magnifierEnabled = !magnifierEnabled;
   const btn = document.getElementById('magnifierToggleBtn');
   if (btn) btn.classList.toggle('active', magnifierEnabled);
+  const label = document.getElementById('magnifierToggleText');
+  if (label) label.textContent = magnifierEnabled ? 'On' : 'Off';
   if (!magnifierEnabled) {
     setMagnifierVisibility(false);
     return;
