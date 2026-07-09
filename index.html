@@ -37,7 +37,10 @@
   .upload-btn:hover{background:rgba(37,99,168,0.4);border-color:rgba(91,163,232,0.7);}
   .upload-btn.active{background:rgba(91,163,232,0.3);border-color:rgba(91,163,232,0.75);color:#ffffff;}
   .icon-btn{width:var(--header-control-h);height:var(--header-control-h);padding:0;justify-content:center;gap:0;}
-  .support-float-btn{position:fixed;right:18px;bottom:18px;z-index:80;height:var(--header-control-h);padding:0 14px;background:rgba(13,30,56,.92);border-color:rgba(200,169,81,.6);color:var(--gold);box-shadow:0 8px 28px rgba(0,0,0,.45);}
+  .floating-actions{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+  .floating-copyright{font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(127,163,200,.62);text-shadow:0 2px 10px rgba(0,0,0,.8);pointer-events:none;}
+  .floating-button-row{display:flex;gap:7px;}
+  .support-float-btn{height:var(--header-control-h);padding:0 12px;background:rgba(13,30,56,.92);border-color:rgba(200,169,81,.6);color:var(--gold);box-shadow:0 8px 28px rgba(0,0,0,.45);}
   .support-float-btn:hover{background:rgba(26,58,96,.95);border-color:rgba(200,169,81,.9);}
   .upload-status{font-size:.68rem;color:var(--gold);letter-spacing:.1em;margin-top:4px;text-align:right;min-height:1em;}
   .layout{display:flex;flex:1;overflow:hidden;}
@@ -46,7 +49,7 @@
   #worldMap .country{fill:var(--blue-country);stroke:var(--country-stroke);stroke-width:0.8;vector-effect:non-scaling-stroke;transition:fill .2s;cursor:pointer;}
   #worldMap .country:hover{fill:var(--blue-accent);}
   #worldMap .country.selected{fill:var(--highlight);stroke:#000000;stroke-width:1.5;vector-effect:non-scaling-stroke;}
-  .side-panel{width:420px;flex-shrink:0;background:var(--panel-bg);border-left:1px solid rgba(59,130,196,.25);display:flex;flex-direction:column;padding:24px;overflow-y:auto;}
+  .side-panel{width:420px;flex-shrink:0;background:var(--panel-bg);border-left:1px solid rgba(59,130,196,.25);display:flex;flex-direction:column;padding:24px 24px 112px;overflow-y:auto;}
   .panel-name{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.08em;line-height:1;margin-bottom:3px;color:var(--panel-text);}
   .panel-pop{font-size:.76rem;color:var(--panel-text-dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;}
   .panel-leader{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:.1em;margin-bottom:18px;color:var(--panel-text);}
@@ -59,7 +62,7 @@
   .magnifier-circle{width:260px;height:260px;border-radius:50%;border:2px solid rgba(140,200,255,.65);box-shadow:0 0 0 1px rgba(100,180,255,.1),0 12px 60px rgba(0,0,0,.65);overflow:hidden;position:relative;background:#0d2c54;}
   .magnifier-circle svg{position:absolute;top:0;left:0;}
   /* Side panel */
-  .side-panel{width:420px;flex-shrink:0;background:#1a3a60;border-left:1px solid rgba(59,130,196,.25);display:flex;flex-direction:column;padding:24px;overflow-y:auto;}
+  .side-panel{width:420px;flex-shrink:0;background:#1a3a60;border-left:1px solid rgba(59,130,196,.25);display:flex;flex-direction:column;padding:24px 24px 112px;overflow-y:auto;}
   .panel-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;opacity:.4;text-align:center;gap:14px;}
   .panel-empty p{font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:#e8eef5;}
   .panel-content{display:none;flex-direction:column;animation:fadeIn .4s ease;}
@@ -79,8 +82,8 @@
   .no-prayers{font-size:.74rem;color:#8ab0cc;font-style:italic;letter-spacing:.04em;line-height:1.6;}
   .instructions{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:.63rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(127,163,200,.35);pointer-events:none;white-space:nowrap;}
   /* Pinned prayer cards at bottom of side panel */
-  .pinned-prayers{margin-top:auto;padding-top:12px;display:flex;flex-direction:column;gap:8px;border-top:1px solid rgba(59,130,196,.2);}
-  .pinned-card{background:rgba(0,115,174,.15);border:1px solid rgba(0,115,174,.4);border-radius:4px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;}
+  .pinned-prayers{margin-top:auto;margin-bottom:12px;padding-top:12px;display:flex;flex-direction:column;gap:8px;border-top:1px solid rgba(59,130,196,.2);transform:translateY(-104px);}
+  .pinned-card{background:rgba(0,22,42,.82);border:1px solid rgba(0,115,174,.5);border-radius:4px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;}
   .pinned-card-header{display:flex;align-items:center;gap:8px;}
   .pinned-flag{font-size:1.3rem;line-height:1;flex-shrink:0;}
   .pinned-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.1em;color:#ffffff;}
@@ -317,10 +320,19 @@
   </div>
 </div>
 
-<button class="upload-btn support-float-btn" id="supportBtn" onclick="openSupportModal()" data-no-export="true">
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 115.8 1c-.8 1.2-2.2 1.5-2.7 2.7"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-  Support / Info
-</button>
+<div class="floating-actions" data-no-export="true">
+  <div class="floating-copyright">© 2026 hilltopcrtv. All rights reserved.</div>
+  <div class="floating-button-row">
+    <button class="upload-btn support-float-btn" id="supportBtn" onclick="openSupportModal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a4 4 0 01-4 4H7l-4 4V7a4 4 0 014-4h10a4 4 0 014 4z"/></svg>
+      Support
+    </button>
+    <button class="upload-btn support-float-btn" id="infoBtn" onclick="openInfoModal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      Info
+    </button>
+  </div>
+</div>
 
 <!-- Settings Panel (left side, no overlay dim) -->
 <div id="settingsOverlay" onclick="settingsOverlayClick(event)">
@@ -522,16 +534,29 @@
   </div>
 </div>
 
-<!-- Support / Info Modal -->
+<!-- Support Modal -->
 <div class="modal-overlay" id="supportModalOverlay" onclick="supportOverlayClick(event)">
   <div class="modal" style="width:520px;">
-    <h2>Support / Info</h2>
+    <h2>Support</h2>
     <p class="modal-desc">A quick place for questions, notes, and presentation support.</p>
     <div class="support-list">
       <div class="support-item">
         <h3>Questions</h3>
         <p>Contact your ministry or media team for help updating countries, prayer points, or presentation details.</p>
       </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeSupportModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Info Modal -->
+<div class="modal-overlay" id="infoModalOverlay" onclick="infoOverlayClick(event)">
+  <div class="modal" style="width:520px;">
+    <h2>Info</h2>
+    <p class="modal-desc">Project notes and local browser details.</p>
+    <div class="support-list">
       <div class="support-item">
         <h3>Saved Info</h3>
         <p>Custom prayer points, country edits, color presets, and singled out card changes are saved in this browser.</p>
@@ -542,7 +567,7 @@
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-primary" onclick="closeSupportModal()">Close</button>
+      <button class="btn btn-primary" onclick="closeInfoModal()">Close</button>
     </div>
   </div>
 </div>
@@ -1594,6 +1619,19 @@ function supportOverlayClick(e) {
   if (e.target === document.getElementById('supportModalOverlay')) closeSupportModal();
 }
 
+function openInfoModal() {
+  closeToolsMenu();
+  document.getElementById('infoModalOverlay')?.classList.add('open');
+}
+
+function closeInfoModal() {
+  document.getElementById('infoModalOverlay')?.classList.remove('open');
+}
+
+function infoOverlayClick(e) {
+  if (e.target === document.getElementById('infoModalOverlay')) closeInfoModal();
+}
+
 function handleFileUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -2091,6 +2129,7 @@ document.addEventListener('click', e => {
   if (e.target === document.getElementById('dlModalOverlay')) closeDlModal();
   if (e.target === document.getElementById('modalOverlay')) closeModal();
   if (e.target === document.getElementById('supportModalOverlay')) closeSupportModal();
+  if (e.target === document.getElementById('infoModalOverlay')) closeInfoModal();
 });
 
 document.addEventListener('pointerdown', e => {
@@ -2112,6 +2151,7 @@ document.addEventListener('keydown', e => {
   closeDlModal();
   closeModal();
   closeSupportModal();
+  closeInfoModal();
 });
 
 loadPinnedCard();
@@ -2265,6 +2305,7 @@ function captureExportCanvas(w, h, scaleOverride) {
     document.getElementById('settingsOverlay'),
     document.getElementById('modalOverlay'),
     document.getElementById('supportModalOverlay'),
+    document.getElementById('infoModalOverlay'),
   ].filter(Boolean);
   const savedVis = hideEls.map(el => ({ el, v: el.style.visibility }));
   hideEls.forEach(el => el.style.visibility = 'hidden');
