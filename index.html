@@ -198,6 +198,9 @@
   .mag-toggle.active .mag-toggle-thumb{left:16px;background:#ffe6a3;}
   .map-container.continent-mode #worldMap .country.out-of-continent{opacity:.12;fill:#25425f;stroke:rgba(120,180,255,.12);}
   .map-container.continent-mode #worldMap .country.in-continent{opacity:1;}
+  .map-container.continent-mode #worldMap .country.territory-hidden{display:none;}
+  .map-container.antarctica-mode{background:var(--ocean-bottom);}
+  .map-container.antarctica-mode #mainOceanRect{fill:var(--ocean-bottom);}
   .map-container.continent-mode #worldMap .country.out-of-continent:hover{fill:#31516f;}
   #worldMap .country{transition:fill .2s,opacity .2s;}
   @media (max-width: 980px) {
@@ -837,13 +840,18 @@ let magnifierEnabled = true;
 const CONTINENTS = ['Africa','Antarctica','Asia','Europe','North America','Oceania','South America'];
 const CONTINENT_VIEWBOXES = {
   'Africa': '315 105 250 290',
-  'Antarctica': '55 373 730 105',
-  'Asia': '245 -14 350 345',
-  'Europe': '273 56 205 175',
-  'North America': '237 9 315 250',
+  'Antarctica': '55 393 730 105',
+  'Asia': '390 0 390 320',
+  'Europe': '317 21 205 175',
+  'North America': '61 9 315 250',
   'Oceania': '620 227 230 180',
   'South America': '157 183 205 250'
 };
+const TERRITORY_CODES = new Set([
+  'AW','BL','BM','BQ','CK','CW','FK','FO','GG','GI','GL','GP','GU','HK','JE','KY',
+  'MF','MO','MQ','NC','PF','PR','RE','SH','SX','TF','TK','VI','WF','YT'
+]);
+const MAINLAND_ONLY_CODES = new Set(['FR','ES','PT','NO','US']);
 const CONTINENT_OVERRIDES = {
   AM:'Asia', AZ:'Asia', CY:'Europe', GE:'Asia', KZ:'Asia', RU:'Asia', TR:'Asia',
   TF:'Antarctica',
@@ -935,10 +943,11 @@ function buildD3Map(world) {
     if (isNaN(numId)) return; // skip features with no valid numeric ID
     const alpha2 = numToAlpha2[numId] || ('N' + numId);
     if (!numToAlpha2[numId]) console.warn('Unmapped country numId:', numId, feature);
-    const d = geoPath(feature);
+    const displayFeature = getDisplayFeature(alpha2, feature);
+    const d = geoPath(displayFeature);
     if (!d) return;
     countryPaths[alpha2] = d;
-    featureMap[alpha2]   = feature;
+    featureMap[alpha2]   = displayFeature;
 
     const el = document.createElementNS('http://www.w3.org/2000/svg','path');
     el.setAttribute('d', d); el.setAttribute('class','country');
@@ -952,12 +961,37 @@ function buildD3Map(world) {
     magEl.setAttribute('data-id', alpha2);
     magSvg.appendChild(magEl);
 
-    el.addEventListener('click', () => onCountryClick(alpha2, el, feature));
+    el.addEventListener('click', () => onCountryClick(alpha2, el, displayFeature));
   });
 
   populateModalSelect();
   renderContinentMenu();
   applyContinentClasses();
+}
+
+function getDisplayFeature(alpha2, feature) {
+  if (!MAINLAND_ONLY_CODES.has(alpha2)) return feature;
+  const geom = feature.geometry;
+  if (!geom || geom.type !== 'MultiPolygon' || !Array.isArray(geom.coordinates)) return feature;
+
+  let bestPolygon = null;
+  let bestArea = -1;
+  geom.coordinates.forEach(polygon => {
+    const candidate = { type:'Feature', properties:feature.properties || {}, geometry:{ type:'Polygon', coordinates:polygon } };
+    const b = geoPath.bounds(candidate);
+    if (!b || !isFinite(b[0][0])) return;
+    const area = Math.max(0, b[1][0] - b[0][0]) * Math.max(0, b[1][1] - b[0][1]);
+    if (area > bestArea) {
+      bestArea = area;
+      bestPolygon = polygon;
+    }
+  });
+
+  if (!bestPolygon) return feature;
+  return {
+    ...feature,
+    geometry: { type:'MultiPolygon', coordinates:[bestPolygon] }
+  };
 }
 
 function getCountryContinent(alpha2) {
@@ -1040,6 +1074,7 @@ function setContinentView(continent) {
   if (badgeName) badgeName.textContent = continent;
   badge?.classList.add('open');
   mapContainer.classList.add('continent-mode');
+  mapContainer.classList.toggle('antarctica-mode', continent === 'Antarctica');
   applyContinentClasses();
   focusContinent(continent);
   renderContinentMenu();
@@ -1049,7 +1084,7 @@ function setContinentView(continent) {
 function clearContinentView() {
   activeContinent = null;
   mapSvg.setAttribute('viewBox', '0 0 1000 500');
-  mapContainer.classList.remove('continent-mode');
+  mapContainer.classList.remove('continent-mode','antarctica-mode');
   document.getElementById('continentBadge')?.classList.remove('open');
   document.getElementById('continentBtn')?.classList.remove('active');
   const label = document.getElementById('continentBtnLabel');
@@ -1061,8 +1096,12 @@ function clearContinentView() {
 
 function applyContinentClasses() {
   Object.entries(pathElements).forEach(([code, el]) => {
-    el.classList.remove('in-continent','out-of-continent');
+    el.classList.remove('in-continent','out-of-continent','territory-hidden');
     if (!activeContinent) return;
+    if (TERRITORY_CODES.has(code)) {
+      el.classList.add('territory-hidden');
+      return;
+    }
     const continent = getCountryContinent(code);
     el.classList.add(continent === activeContinent ? 'in-continent' : 'out-of-continent');
   });
@@ -1570,6 +1609,7 @@ function addOcean() {
   mapSvg.insertBefore(defs, mapSvg.firstChild);
   const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
   rect.setAttribute('width','1000'); rect.setAttribute('height','500');
+  rect.setAttribute('id','mainOceanRect');
   rect.setAttribute('fill','url(#oceanGrad)');
   mapSvg.insertBefore(rect, defs.nextSibling);
 
