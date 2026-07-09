@@ -868,6 +868,8 @@ const magnifier    = document.getElementById('magnifier');
 const magSvg       = document.getElementById('magSvg');
 const connectorSvg = document.getElementById('connectorSvg');
 const mapContainer = document.getElementById('mapContainer');
+const WORLD_VIEWBOX = '0 0 1000 500';
+const WORLD_PROJECTION_CENTER = [500, 250];
 
 let selectedCountry = null, countryPaths = {}, pathElements = {}, featureMap = {};
 let geoPath, geoProjection;
@@ -933,7 +935,7 @@ function buildD3Map(world) {
   geoProjection = d3.geoNaturalEarth1()
     .rotate([-10, 0, 0])   // shift central meridian 10° east — moves cut line away from Russia
     .scale(155)
-    .translate([420, 250]);
+    .translate(WORLD_PROJECTION_CENTER);
   geoPath = d3.geoPath().projection(geoProjection);
   const countries = topojson.feature(world, world.objects.countries);
 
@@ -1118,7 +1120,7 @@ function setContinentView(continent) {
 
 function clearContinentView() {
   activeContinent = null;
-  mapSvg.setAttribute('viewBox', '0 0 1000 500');
+  mapSvg.setAttribute('viewBox', WORLD_VIEWBOX);
   mapContainer.classList.remove('continent-mode');
   document.getElementById('continentBadge')?.classList.remove('open');
   document.getElementById('continentBtn')?.classList.remove('active');
