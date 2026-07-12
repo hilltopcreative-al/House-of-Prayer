@@ -25,7 +25,9 @@
     --country-stroke:rgba(120,180,255,.35);
     --map-stroke-width:.5;
     --header-control-h:34px;
+    --ui-scale:1;
   }
+  html{font-size:calc(16px * var(--ui-scale));}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--navy);color:var(--white);font-family:'Barlow Condensed',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
   header{padding:14px 36px 10px;border-bottom:1px solid rgba(59,130,196,0.2);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:22px;background:var(--header-bg);}
@@ -357,6 +359,15 @@
 <div id="settingsOverlay" onclick="settingsOverlayClick(event)">
   <div class="settings-modal">
     <h2>Settings <button class="settings-close-btn" onclick="closeSettingsModal()">✕</button></h2>
+
+    <div class="settings-section">Readability</div>
+    <div class="settings-row">
+      <label class="settings-label">Text Size <span id="uiScaleLabel">100%</span></label>
+      <input class="settings-slider" type="range" id="uiScaleSlider" min="0.9" max="1.5" step="0.05" value="1.0" oninput="onUiScaleSlider(this.value)">
+      <p class="settings-hint">Scales interface text across the app without changing magnifier country names.</p>
+    </div>
+
+    <div class="settings-divider"></div>
 
     <div class="settings-section-row">
       <div class="settings-section">Magnifier</div>
@@ -868,6 +879,7 @@ const magnifier    = document.getElementById('magnifier');
 const magSvg       = document.getElementById('magSvg');
 const connectorSvg = document.getElementById('connectorSvg');
 const mapContainer = document.getElementById('mapContainer');
+const root = document.documentElement;
 const WORLD_VIEWBOX = '0 0 1000 500';
 const WORLD_PROJECTION_CENTER = [500, 250];
 
@@ -913,6 +925,7 @@ let magOffsetX = 0;
 let magOffsetY = 0;
 let magConeTipOffsetX = 0;
 let magConeTipOffsetY = 0;
+let uiScale = 1.0;
 
 function loadFallbackMap() {
   fetch('https://unpkg.com/world-atlas@2/countries-110m.json')
@@ -1893,6 +1906,28 @@ function settingsOverlayClick(e) {
   if (!e.target.closest('.settings-modal')) closeSettingsModal();
 }
 
+function applyUiScale(value, persist = true) {
+  uiScale = Math.max(0.9, Math.min(1.5, parseFloat(value) || 1));
+  root.style.setProperty('--ui-scale', uiScale.toFixed(2));
+  const slider = document.getElementById('uiScaleSlider');
+  const label = document.getElementById('uiScaleLabel');
+  if (slider) slider.value = uiScale.toFixed(2);
+  if (label) label.textContent = Math.round(uiScale * 100) + '%';
+  if (persist) {
+    try { localStorage.setItem('houseOfPrayerUiScale', uiScale.toFixed(2)); } catch(e) {}
+  }
+}
+
+function loadUiScale() {
+  let saved = null;
+  try { saved = localStorage.getItem('houseOfPrayerUiScale'); } catch(e) {}
+  applyUiScale(saved || 1, false);
+}
+
+function onUiScaleSlider(val) {
+  applyUiScale(val);
+}
+
 function onZoomSlider(val) {
   magZoomMultiplier = parseFloat(val);
   document.getElementById('zoomLabel').textContent = magZoomMultiplier.toFixed(2) + '×';
@@ -1943,6 +1978,8 @@ function resetSettings() {
   magZoomMultiplier = 1.0; magCircleSize = 260; magSelectedFontPx = 12;
   magStrokeWidth = 0.6; magOffsetX = 0; magOffsetY = 0;
   magConeTipOffsetX = 0; magConeTipOffsetY = 0;
+  applyUiScale(1);
+  document.getElementById('uiScaleSlider').value   = 1.0;
   document.getElementById('zoomSlider').value      = 1.0;
   document.getElementById('sizeSlider').value      = 260;
   document.getElementById('nameSizeSlider').value  = 12;
@@ -1987,7 +2024,7 @@ document.getElementById('worldMap').addEventListener('click', e => {
 });
 
 // ── COLOR THEME ENGINE ────────────────────────────────────────
-const root = document.documentElement;
+loadUiScale();
 
 function setVar(name, value) {
   root.style.setProperty(name, value);
