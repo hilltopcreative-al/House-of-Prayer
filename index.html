@@ -1701,7 +1701,7 @@ function closeModal() {
 }
 
 function overlayClick(e) {
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
+  if (shouldCloseOverlayFromClick(e, 'modalOverlay')) closeModal();
 }
 
 function openSupportModal() {
@@ -1754,7 +1754,7 @@ function closeInfoModal() {
 }
 
 function infoOverlayClick(e) {
-  if (e.target === document.getElementById('infoModalOverlay')) closeInfoModal();
+  if (shouldCloseOverlayFromClick(e, 'infoModalOverlay')) closeInfoModal();
 }
 
 function handleFileUpload(e) {
@@ -2239,6 +2239,19 @@ function closeSearch() {
   document.getElementById('countrySearch').blur();
 }
 
+const overlayClickStartedOutside = new WeakMap();
+
+function trackOverlayPointerOrigin(e) {
+  const overlay = e.target.closest?.('.modal-overlay.open');
+  if (!overlay) return;
+  overlayClickStartedOutside.set(overlay, e.target === overlay);
+}
+
+function shouldCloseOverlayFromClick(e, overlayId) {
+  const overlay = document.getElementById(overlayId);
+  return e.target === overlay && overlayClickStartedOutside.get(overlay) === true;
+}
+
 // Close dropdown when clicking outside
 document.addEventListener('click', e => {
   if (!e.target.closest('.search-wrap')) closeSearch();
@@ -2252,12 +2265,13 @@ document.addEventListener('click', e => {
   ) {
     closeSettingsModal();
   }
-  if (e.target === document.getElementById('dlModalOverlay')) closeDlModal();
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
-  if (e.target === document.getElementById('infoModalOverlay')) closeInfoModal();
+  if (shouldCloseOverlayFromClick(e, 'dlModalOverlay')) closeDlModal();
+  if (shouldCloseOverlayFromClick(e, 'modalOverlay')) closeModal();
+  if (shouldCloseOverlayFromClick(e, 'infoModalOverlay')) closeInfoModal();
 });
 
 document.addEventListener('pointerdown', e => {
+  trackOverlayPointerOrigin(e);
   if (
     document.getElementById('settingsOverlay')?.classList.contains('open') &&
     !e.target.closest('.settings-modal') &&
@@ -2535,7 +2549,7 @@ function closeDlModal() {
 }
 
 function dlOverlayClick(e) {
-  if (e.target === document.getElementById('dlModalOverlay')) closeDlModal();
+  if (shouldCloseOverlayFromClick(e, 'dlModalOverlay')) closeDlModal();
 }
 
 function setDlSize(w, h, btn) {
