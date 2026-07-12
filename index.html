@@ -53,6 +53,13 @@
   #worldMap .country{fill:var(--blue-country);stroke:var(--country-stroke);stroke-width:0.8;vector-effect:non-scaling-stroke;transition:fill .2s;cursor:pointer;}
   #worldMap .country:hover{fill:var(--blue-accent);}
   #worldMap .country.selected{fill:var(--highlight);stroke:#000000;stroke-width:1.5;vector-effect:non-scaling-stroke;}
+  #worldMap .island-overlay{display:none;}
+  .map-container.island-mode #worldMap .island-overlay{display:block;}
+  #worldMap .island-boundary{fill:rgba(0,115,174,.05);stroke:rgba(200,169,81,.78);stroke-width:1;stroke-dasharray:4 3;vector-effect:non-scaling-stroke;pointer-events:auto;cursor:pointer;}
+  #worldMap .island-marker{fill:rgba(0,22,42,.78);stroke:rgba(123,200,245,.76);stroke-width:.85;vector-effect:non-scaling-stroke;pointer-events:auto;cursor:pointer;}
+  #worldMap .island-label{fill:#d9ecff;font-family:'Barlow Condensed',sans-serif;font-size:6.4px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-anchor:middle;paint-order:stroke;stroke:#00162a;stroke-width:2.2;stroke-linejoin:round;pointer-events:auto;cursor:pointer;}
+  #worldMap .island-outline-item:hover .island-boundary{stroke:#ffffff;fill:rgba(200,169,81,.08);}
+  #worldMap .island-outline-item:hover .island-marker{stroke:#ffffff;fill:var(--highlight);}
   .side-panel{width:420px;flex-shrink:0;background:var(--panel-bg);border-left:1px solid rgba(59,130,196,.25);display:flex;flex-direction:column;padding:24px 24px 112px;overflow-y:auto;}
   .panel-name{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.08em;line-height:1;margin-bottom:3px;color:var(--panel-text);}
   .panel-pop{font-size:.76rem;color:var(--panel-text-dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;}
@@ -197,11 +204,12 @@
   .continent-wrap{position:relative;}
   .continent-btn{height:var(--header-control-h);display:flex;align-items:center;gap:7px;background:rgba(91,163,232,.14);border:1px solid rgba(91,163,232,.38);color:var(--blue-accent);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:0 12px;cursor:pointer;border-radius:3px;transition:all .2s;white-space:nowrap;line-height:1;}
   .continent-btn:hover,.continent-btn.active{background:rgba(91,163,232,.28);border-color:rgba(91,163,232,.7);color:var(--white);}
-  .continent-dropdown{position:absolute;top:calc(100% + 5px);left:0;width:190px;background:#0d1e38;border:1px solid rgba(91,163,232,.35);border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.65);z-index:320;display:none;overflow:hidden;}
+  .continent-dropdown{position:absolute;top:calc(100% + 5px);left:0;width:205px;background:#0d1e38;border:1px solid rgba(91,163,232,.35);border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.65);z-index:320;display:none;overflow:hidden;}
   .continent-dropdown.open{display:block;}
   .continent-item{width:100%;border:none;border-bottom:1px solid rgba(59,130,196,.14);background:transparent;color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;text-align:left;padding:9px 12px;cursor:pointer;}
   .continent-item:last-child{border-bottom:none;}
   .continent-item:hover,.continent-item.active{background:rgba(91,163,232,.22);color:#ffffff;}
+  .view-menu-label{padding:8px 12px 5px;background:rgba(0,15,33,.45);border-bottom:1px solid rgba(59,130,196,.16);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;}
   .continent-badge{position:absolute;top:14px;left:16px;z-index:12;display:none;align-items:center;gap:10px;background:rgba(0,15,33,.76);border:1px solid rgba(91,163,232,.35);border-radius:4px;padding:8px 10px;box-shadow:0 8px 28px rgba(0,0,0,.35);backdrop-filter:blur(8px);}
   .continent-badge.open{display:flex;}
   .continent-badge span{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.12em;color:#ffffff;line-height:1;}
@@ -268,9 +276,9 @@
     </div>
     <div class="header-tools" id="headerTools">
       <div class="continent-wrap">
-        <button class="continent-btn" id="continentBtn" onclick="toggleContinentMenu()" title="Choose Continent">
+        <button class="continent-btn" id="continentBtn" onclick="toggleContinentMenu()" title="Choose View">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 010 20"/><path d="M12 2a15.3 15.3 0 000 20"/></svg>
-          <span id="continentBtnLabel">Continents</span>
+          <span id="continentBtnLabel">Views</span>
         </button>
         <div class="continent-dropdown" id="continentDropdown"></div>
       </div>
@@ -890,10 +898,12 @@ const connectorSvg = document.getElementById('connectorSvg');
 const mapContainer = document.getElementById('mapContainer');
 const root = document.documentElement;
 const WORLD_VIEWBOX = '0 0 1000 500';
+const ISLAND_VIEWBOX = '590 70 410 310';
 const WORLD_PROJECTION_CENTER = [500, 250];
 
 let selectedCountry = null, countryPaths = {}, pathElements = {}, featureMap = {};
 let geoPath, geoProjection;
+let activeView = 'World';
 let activeContinent = null;
 let magnifierEnabled = true;
 const CONTINENTS = ['Africa','Antarctica','Asia','Europe','North America','Oceania','South America'];
@@ -906,9 +916,30 @@ const CONTINENT_VIEWBOXES = {
   'Oceania': '620 227 230 180',
   'South America': '157 183 205 250'
 };
+const ISLAND_OUTLINES = [
+  { code:'PW', label:'Palau', bbox:[130, 2, 136, 10] },
+  { code:'GU', label:'Guam', bbox:[142, 11, 147, 16] },
+  { code:'FM', label:'Micronesia', bbox:[137, 0, 165, 12] },
+  { code:'MH', label:'Marshall Islands', bbox:[160, 4, 176, 15] },
+  { code:'NR', label:'Nauru', bbox:[165, -2, 168, 1] },
+  { code:'KI', label:'Kiribati', bbox:[168, -6, 193, 7] },
+  { code:'TV', label:'Tuvalu', bbox:[176, -10, 181, -5] },
+  { code:'TK', label:'Tokelau', bbox:[187, -11, 191, -7] },
+  { code:'WS', label:'Samoa', bbox:[187, -16, 193, -12] },
+  { code:'WF', label:'Wallis and Futuna', bbox:[181, -15, 185, -12] },
+  { code:'TO', label:'Tonga', bbox:[184, -23, 190, -15] },
+  { code:'FJ', label:'Fiji', bbox:[175, -21, 183, -15] },
+  { code:'VU', label:'Vanuatu', bbox:[164, -21, 171, -13] },
+  { code:'SB', label:'Solomon Islands', bbox:[154, -13, 164, -5] },
+  { code:'CK', label:'Cook Islands', bbox:[196, -23, 204, -8] },
+  { code:'PF', label:'French Polynesia', bbox:[205, -28, 235, -8] },
+  { code:'NC', label:'New Caledonia', bbox:[162, -24, 168, -18] }
+];
+const ISLAND_WRAP_SHIFT_X = 820;
 const MAP_EXTENT = { x:0, y:0, w:1000, h:500 };
 const MAP_VIEW_STORAGE_KEY = 'houseOfPrayerMapViews';
 const MAP_MAX_ZOOM_WORLD = 3;
+const MAP_MAX_ZOOM_ISLAND = 5;
 const MAP_MAX_ZOOM_CONTINENT = 4;
 let customMapViewBoxes = {};
 let mapPanState = null;
@@ -1034,10 +1065,74 @@ function buildD3Map(world) {
     });
   });
 
+  renderIslandOverlay();
   populateModalSelect();
   renderContinentMenu();
   applyContinentClasses();
   applyMapView(getMapViewKey());
+}
+
+function getIslandOutlineSize(item) {
+  const lonSpan = Math.abs(item.bbox[2] - item.bbox[0]);
+  const latSpan = Math.abs(item.bbox[3] - item.bbox[1]);
+  const labelWidth = (item.label.length * 3.8) + 14;
+  return {
+    w: Math.min(128, Math.max(34, lonSpan * 3.4, labelWidth)),
+    h: Math.min(72, Math.max(22, latSpan * 5.2))
+  };
+}
+
+function renderIslandOverlay() {
+  document.getElementById('islandOverlay')?.remove();
+  const group = document.createElementNS('http://www.w3.org/2000/svg','g');
+  group.setAttribute('id','islandOverlay');
+  group.setAttribute('class','island-overlay');
+
+  ISLAND_OUTLINES.forEach(item => {
+    const center = geoProjection([(item.bbox[0] + item.bbox[2]) / 2, (item.bbox[1] + item.bbox[3]) / 2]);
+    if (!center) return;
+    const shiftX = center[0] < 300 ? ISLAND_WRAP_SHIFT_X : 0;
+    const labelX = center[0] + shiftX;
+    const size = getIslandOutlineSize(item);
+
+    const outlineItem = document.createElementNS('http://www.w3.org/2000/svg','g');
+    outlineItem.setAttribute('class','island-outline-item');
+    outlineItem.setAttribute('data-id', item.code);
+
+    const boundary = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    boundary.setAttribute('x', (labelX - size.w / 2).toFixed(2));
+    boundary.setAttribute('y', (center[1] - size.h / 2).toFixed(2));
+    boundary.setAttribute('width', size.w.toFixed(2));
+    boundary.setAttribute('height', size.h.toFixed(2));
+    boundary.setAttribute('class','island-boundary');
+    outlineItem.appendChild(boundary);
+
+    const marker = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    marker.setAttribute('cx', labelX.toFixed(2));
+    marker.setAttribute('cy', center[1].toFixed(2));
+    marker.setAttribute('r', '2.1');
+    marker.setAttribute('class','island-marker');
+    outlineItem.appendChild(marker);
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x', labelX.toFixed(2));
+    label.setAttribute('y', (center[1] - 5).toFixed(2));
+    label.setAttribute('class','island-label');
+    label.textContent = item.label;
+    outlineItem.appendChild(label);
+
+    outlineItem.addEventListener('click', e => {
+      e.stopPropagation();
+      if (consumeMapDragClick()) return;
+      if (pathElements[item.code] && featureMap[item.code]) {
+        onCountryClick(item.code, pathElements[item.code], featureMap[item.code]);
+      }
+    });
+
+    group.appendChild(outlineItem);
+  });
+
+  mapSvg.appendChild(group);
 }
 
 function getDisplayFeature(alpha2, feature) {
@@ -1104,9 +1199,15 @@ function getCountryContinent(alpha2) {
 function renderContinentMenu() {
   const dropdown = document.getElementById('continentDropdown');
   if (!dropdown) return;
-  dropdown.innerHTML = CONTINENTS.map(name =>
-    `<button class="continent-item ${name === activeContinent ? 'active' : ''}" onclick="setContinentView('${name}')">${name}</button>`
+  const continentItems = CONTINENTS.map(name =>
+    `<button class="continent-item ${activeView === 'Continent' && name === activeContinent ? 'active' : ''}" onclick="setContinentView('${name}')">${name}</button>`
   ).join('');
+  dropdown.innerHTML = `
+    <button class="continent-item ${activeView === 'World' ? 'active' : ''}" onclick="setWorldView()">World View</button>
+    <button class="continent-item ${activeView === 'Island' ? 'active' : ''}" onclick="setIslandView()">Island View</button>
+    <div class="view-menu-label">Continents</div>
+    ${continentItems}
+  `;
 }
 
 function closeToolsMenu() {
@@ -1159,11 +1260,13 @@ function formatViewBox(view) {
 }
 
 function getMapViewKey() {
-  return activeContinent || 'World';
+  return activeView === 'Continent' ? (activeContinent || 'World') : activeView;
 }
 
 function getDefaultMapViewBox(key = getMapViewKey()) {
-  return parseViewBox(key === 'World' ? WORLD_VIEWBOX : (CONTINENT_VIEWBOXES[key] || WORLD_VIEWBOX));
+  if (key === 'World') return parseViewBox(WORLD_VIEWBOX);
+  if (key === 'Island') return parseViewBox(ISLAND_VIEWBOX);
+  return parseViewBox(CONTINENT_VIEWBOXES[key] || WORLD_VIEWBOX);
 }
 
 function getCurrentMapViewBox() {
@@ -1181,7 +1284,7 @@ function saveMapViewBoxes() {
 
 function clampMapViewBox(view, key = getMapViewKey()) {
   const base = getDefaultMapViewBox(key);
-  const maxZoom = key === 'World' ? MAP_MAX_ZOOM_WORLD : MAP_MAX_ZOOM_CONTINENT;
+  const maxZoom = key === 'World' ? MAP_MAX_ZOOM_WORLD : (key === 'Island' ? MAP_MAX_ZOOM_ISLAND : MAP_MAX_ZOOM_CONTINENT);
   const minW = base.w / maxZoom;
   const minH = base.h / maxZoom;
   const maxW = base.w;
@@ -1228,15 +1331,17 @@ function setContinentView(continent) {
   if (selectedCountry && getCountryContinent(selectedCountry) !== continent) {
     clearSelectedCountry();
   }
+  activeView = 'Continent';
   activeContinent = continent;
   document.getElementById('continentDropdown')?.classList.remove('open');
   document.getElementById('continentBtn')?.classList.add('active');
   const label = document.getElementById('continentBtnLabel');
-  if (label) label.textContent = continent;
+  if (label) label.textContent = 'Views';
   const badge = document.getElementById('continentBadge');
   const badgeName = document.getElementById('continentBadgeName');
   if (badgeName) badgeName.textContent = continent;
   badge?.classList.add('open');
+  mapContainer.classList.remove('island-mode');
   mapContainer.classList.add('continent-mode');
   applyContinentClasses();
   applyMapView(continent);
@@ -1244,17 +1349,43 @@ function setContinentView(continent) {
   closeToolsMenu();
 }
 
-function clearContinentView() {
+function setIslandView() {
+  activeView = 'Island';
+  activeContinent = null;
+  mapContainer.classList.remove('continent-mode');
+  mapContainer.classList.add('island-mode');
+  document.getElementById('continentDropdown')?.classList.remove('open');
+  document.getElementById('continentBtn')?.classList.add('active');
+  const label = document.getElementById('continentBtnLabel');
+  if (label) label.textContent = 'Views';
+  const badge = document.getElementById('continentBadge');
+  const badgeName = document.getElementById('continentBadgeName');
+  if (badgeName) badgeName.textContent = 'Island View';
+  badge?.classList.add('open');
+  applyContinentClasses();
+  applyMapView('Island');
+  renderContinentMenu();
+  refreshMagnifier();
+  closeToolsMenu();
+}
+
+function setWorldView() {
+  activeView = 'World';
   activeContinent = null;
   applyMapView('World');
-  mapContainer.classList.remove('continent-mode');
+  mapContainer.classList.remove('continent-mode','island-mode');
   document.getElementById('continentBadge')?.classList.remove('open');
   document.getElementById('continentBtn')?.classList.remove('active');
   const label = document.getElementById('continentBtnLabel');
-  if (label) label.textContent = 'Continents';
+  if (label) label.textContent = 'Views';
   applyContinentClasses();
   renderContinentMenu();
   refreshMagnifier();
+  closeToolsMenu();
+}
+
+function clearContinentView() {
+  setWorldView();
 }
 
 function applyContinentClasses() {
