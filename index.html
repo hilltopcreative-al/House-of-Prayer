@@ -47,7 +47,8 @@
   .upload-status{font-size:.68rem;color:var(--gold);letter-spacing:.1em;margin-top:4px;text-align:right;min-height:1em;}
   .layout{display:flex;flex:1;overflow:hidden;}
   .map-container{flex:1;position:relative;overflow:hidden;background:linear-gradient(to bottom,var(--ocean-top) 0%,var(--ocean-bottom) 100%);background-size:100% 135%;background-position:center center;background-repeat:no-repeat;}
-  #worldMap{width:100%;height:100%;}
+  #worldMap{width:100%;height:100%;cursor:grab;touch-action:none;}
+  #worldMap.panning{cursor:grabbing;}
   #mainOceanRect{fill:transparent;}
   #worldMap .country{fill:var(--blue-country);stroke:var(--country-stroke);stroke-width:0.8;vector-effect:non-scaling-stroke;transition:fill .2s;cursor:pointer;}
   #worldMap .country:hover{fill:var(--blue-accent);}
@@ -365,6 +366,14 @@
       <label class="settings-label">Text Size <span id="uiScaleLabel">100%</span></label>
       <input class="settings-slider" type="range" id="uiScaleSlider" min="0.9" max="1.5" step="0.05" value="1.0" oninput="onUiScaleSlider(this.value)">
       <p class="settings-hint">Scales interface text across the app without changing magnifier country names.</p>
+    </div>
+
+    <div class="settings-divider"></div>
+
+    <div class="settings-section">Map View</div>
+    <div class="settings-row">
+      <button class="pos-btn" onclick="resetCurrentMapView()">Reset Current View</button>
+      <p class="settings-hint">Resets the current world or continent framing.</p>
     </div>
 
     <div class="settings-divider"></div>
@@ -897,6 +906,13 @@ const CONTINENT_VIEWBOXES = {
   'Oceania': '620 227 230 180',
   'South America': '157 183 205 250'
 };
+const MAP_EXTENT = { x:0, y:0, w:1000, h:500 };
+const MAP_VIEW_STORAGE_KEY = 'houseOfPrayerMapViews';
+const MAP_MAX_ZOOM_WORLD = 3;
+const MAP_MAX_ZOOM_CONTINENT = 4;
+let customMapViewBoxes = {};
+let mapPanState = null;
+let suppressMapClick = false;
 const TERRITORY_CODES = new Set([
   'AW','BL','BM','BQ','CK','CW','FK','FO','GG','GI','GP','GU','HK','JE','KY',
   'MF','MO','MQ','NC','PF','RE','SH','SX','TF','TK','VI','WF','YT'
@@ -1012,12 +1028,16 @@ function buildD3Map(world) {
     magEl.setAttribute('data-id', alpha2);
     magSvg.appendChild(magEl);
 
-    el.addEventListener('click', () => onCountryClick(alpha2, el, displayFeature));
+    el.addEventListener('click', () => {
+      if (consumeMapDragClick()) return;
+      onCountryClick(alpha2, el, displayFeature);
+    });
   });
 
   populateModalSelect();
   renderContinentMenu();
   applyContinentClasses();
+  applyMapView(getMapViewKey());
 }
 
 function getDisplayFeature(alpha2, feature) {
@@ -1128,6 +1148,82 @@ function toggleMagnifier() {
   refreshMagnifier();
 }
 
+function parseViewBox(value) {
+  const parts = String(value || '').trim().split(/\s+/).map(Number);
+  if (parts.length !== 4 || parts.some(n => !Number.isFinite(n))) return parseViewBox(WORLD_VIEWBOX);
+  return { x:parts[0], y:parts[1], w:parts[2], h:parts[3] };
+}
+
+function formatViewBox(view) {
+  return [view.x, view.y, view.w, view.h].map(n => Number(n).toFixed(3).replace(/\.?0+$/,'')).join(' ');
+}
+
+function getMapViewKey() {
+  return activeContinent || 'World';
+}
+
+function getDefaultMapViewBox(key = getMapViewKey()) {
+  return parseViewBox(key === 'World' ? WORLD_VIEWBOX : (CONTINENT_VIEWBOXES[key] || WORLD_VIEWBOX));
+}
+
+function getCurrentMapViewBox() {
+  return parseViewBox(mapSvg.getAttribute('viewBox') || WORLD_VIEWBOX);
+}
+
+function loadSavedMapViewBoxes() {
+  try { customMapViewBoxes = JSON.parse(localStorage.getItem(MAP_VIEW_STORAGE_KEY) || '{}') || {}; }
+  catch(e) { customMapViewBoxes = {}; }
+}
+
+function saveMapViewBoxes() {
+  try { localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify(customMapViewBoxes)); } catch(e) {}
+}
+
+function clampMapViewBox(view, key = getMapViewKey()) {
+  const base = getDefaultMapViewBox(key);
+  const maxZoom = key === 'World' ? MAP_MAX_ZOOM_WORLD : MAP_MAX_ZOOM_CONTINENT;
+  const minW = base.w / maxZoom;
+  const minH = base.h / maxZoom;
+  const maxW = base.w;
+  const maxH = base.h;
+  let w = Math.max(minW, Math.min(maxW, view.w));
+  let h = Math.max(minH, Math.min(maxH, view.h));
+  const ratio = base.w / base.h;
+  if (Math.abs((w / h) - ratio) > 0.001) {
+    if (w / h > ratio) w = h * ratio;
+    else h = w / ratio;
+  }
+  w = Math.max(minW, Math.min(maxW, w));
+  h = Math.max(minH, Math.min(maxH, h));
+  const x = Math.max(MAP_EXTENT.x, Math.min(MAP_EXTENT.x + MAP_EXTENT.w - w, view.x));
+  const y = Math.max(MAP_EXTENT.y, Math.min(MAP_EXTENT.y + MAP_EXTENT.h - h, view.y));
+  return { x, y, w, h };
+}
+
+function setMapViewBox(view, { save = true, key = getMapViewKey(), refresh = true } = {}) {
+  const next = clampMapViewBox(view, key);
+  mapSvg.setAttribute('viewBox', formatViewBox(next));
+  if (save) {
+    customMapViewBoxes[key] = formatViewBox(next);
+    saveMapViewBoxes();
+  }
+  if (refresh) refreshMagnifier();
+  return next;
+}
+
+function applyMapView(key = getMapViewKey()) {
+  const saved = customMapViewBoxes[key];
+  const view = saved ? parseViewBox(saved) : getDefaultMapViewBox(key);
+  setMapViewBox(view, { save:false, key });
+}
+
+function resetCurrentMapView() {
+  const key = getMapViewKey();
+  delete customMapViewBoxes[key];
+  saveMapViewBoxes();
+  applyMapView(key);
+}
+
 function setContinentView(continent) {
   if (selectedCountry && getCountryContinent(selectedCountry) !== continent) {
     clearSelectedCountry();
@@ -1143,14 +1239,14 @@ function setContinentView(continent) {
   badge?.classList.add('open');
   mapContainer.classList.add('continent-mode');
   applyContinentClasses();
-  focusContinent(continent);
+  applyMapView(continent);
   renderContinentMenu();
   closeToolsMenu();
 }
 
 function clearContinentView() {
   activeContinent = null;
-  mapSvg.setAttribute('viewBox', WORLD_VIEWBOX);
+  applyMapView('World');
   mapContainer.classList.remove('continent-mode');
   document.getElementById('continentBadge')?.classList.remove('open');
   document.getElementById('continentBtn')?.classList.remove('active');
@@ -1176,7 +1272,7 @@ function applyContinentClasses() {
 
 function focusContinent(continent) {
   if (CONTINENT_VIEWBOXES[continent]) {
-    mapSvg.setAttribute('viewBox', CONTINENT_VIEWBOXES[continent]);
+    applyMapView(continent);
     refreshMagnifier();
     return;
   }
@@ -1206,7 +1302,7 @@ function focusContinent(continent) {
   const viewY = Math.max(0, minY - pad);
   const viewW = Math.min(1000 - viewX, width + pad * 2);
   const viewH = Math.min(500 - viewY, height + pad * 2);
-  mapSvg.setAttribute('viewBox', `${viewX} ${viewY} ${viewW} ${viewH}`);
+  setMapViewBox({ x:viewX, y:viewY, w:viewW, h:viewH }, { save:false });
   refreshMagnifier();
 }
 
@@ -1978,6 +2074,8 @@ function resetSettings() {
   magZoomMultiplier = 1.0; magCircleSize = 260; magSelectedFontPx = 12;
   magStrokeWidth = 0.6; magOffsetX = 0; magOffsetY = 0;
   magConeTipOffsetX = 0; magConeTipOffsetY = 0;
+  customMapViewBoxes = {};
+  saveMapViewBoxes();
   applyUiScale(1);
   document.getElementById('uiScaleSlider').value   = 1.0;
   document.getElementById('zoomSlider').value      = 1.0;
@@ -1999,6 +2097,7 @@ function resetSettings() {
   const circle = document.querySelector('.magnifier-circle');
   if (circle) { circle.style.width = '260px'; circle.style.height = '260px'; }
   onStrokeSlider(0.6);
+  applyMapView(getMapViewKey());
   refreshMagnifier();
 }
 
@@ -2015,13 +2114,84 @@ function refreshMagnifier() {
   else setMagnifierVisibility(false);
 }
 
+function consumeMapDragClick() {
+  if (!suppressMapClick) return false;
+  suppressMapClick = false;
+  return true;
+}
+
+function onMapPointerDown(e) {
+  if (e.button !== 0) return;
+  const view = getCurrentMapViewBox();
+  mapPanState = {
+    pointerId:e.pointerId,
+    startX:e.clientX,
+    startY:e.clientY,
+    view,
+    moved:false,
+    key:getMapViewKey()
+  };
+  mapSvg.classList.add('panning');
+  mapSvg.setPointerCapture?.(e.pointerId);
+}
+
+function onMapPointerMove(e) {
+  if (!mapPanState || e.pointerId !== mapPanState.pointerId) return;
+  const dx = e.clientX - mapPanState.startX;
+  const dy = e.clientY - mapPanState.startY;
+  if (Math.hypot(dx, dy) > 4) {
+    mapPanState.moved = true;
+    suppressMapClick = true;
+  }
+  const rect = mapSvg.getBoundingClientRect();
+  setMapViewBox({
+    x:mapPanState.view.x - dx * (mapPanState.view.w / rect.width),
+    y:mapPanState.view.y - dy * (mapPanState.view.h / rect.height),
+    w:mapPanState.view.w,
+    h:mapPanState.view.h
+  }, { save:false, key:mapPanState.key });
+}
+
+function finishMapPan(e) {
+  if (!mapPanState || e.pointerId !== mapPanState.pointerId) return;
+  if (mapPanState.moved) {
+    setMapViewBox(getCurrentMapViewBox(), { save:true, key:mapPanState.key });
+  }
+  mapSvg.releasePointerCapture?.(e.pointerId);
+  mapSvg.classList.remove('panning');
+  mapPanState = null;
+}
+
+function onMapWheel(e) {
+  e.preventDefault();
+  const rect = mapSvg.getBoundingClientRect();
+  const view = getCurrentMapViewBox();
+  const pointerX = view.x + ((e.clientX - rect.left) / rect.width) * view.w;
+  const pointerY = view.y + ((e.clientY - rect.top) / rect.height) * view.h;
+  const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
+  const nextW = view.w * zoomFactor;
+  const nextH = view.h * zoomFactor;
+  const next = {
+    x:pointerX - (pointerX - view.x) * (nextW / view.w),
+    y:pointerY - (pointerY - view.y) * (nextH / view.h),
+    w:nextW,
+    h:nextH
+  };
+  setMapViewBox(next);
+}
 
 document.getElementById('worldMap').addEventListener('click', e => {
+  if (consumeMapDragClick()) return;
   // If click landed on ocean (not a country path), deselect
   if (e.target === document.getElementById('worldMap') || e.target.tagName === 'rect') {
     clearSelectedCountry();
   }
 });
+mapSvg.addEventListener('pointerdown', onMapPointerDown);
+mapSvg.addEventListener('pointermove', onMapPointerMove);
+mapSvg.addEventListener('pointerup', finishMapPan);
+mapSvg.addEventListener('pointercancel', finishMapPan);
+mapSvg.addEventListener('wheel', onMapWheel, { passive:false });
 
 // ── COLOR THEME ENGINE ────────────────────────────────────────
 loadUiScale();
@@ -2332,6 +2502,7 @@ document.addEventListener('keydown', e => {
 loadPinnedCard();
 renderPinnedCard();
 addOcean();
+loadSavedMapViewBoxes();
 loadFallbackMap();
 </script>
 
