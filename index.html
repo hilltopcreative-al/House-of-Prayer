@@ -26,6 +26,7 @@
     --map-stroke-width:.5;
     --header-control-h:34px;
     --ui-scale:1;
+    --panel-width:420px;
   }
   html{font-size:calc(16px * var(--ui-scale));}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -55,12 +56,14 @@
   #worldMap .country.selected{fill:var(--highlight);stroke:#000000;stroke-width:1.5;vector-effect:non-scaling-stroke;}
   #worldMap .island-overlay{display:none;}
   .map-container.island-mode #worldMap .island-overlay{display:block;}
-  #worldMap .island-boundary{fill:rgba(0,115,174,.05);stroke:rgba(200,169,81,.78);stroke-width:1;stroke-dasharray:4 3;vector-effect:non-scaling-stroke;pointer-events:auto;cursor:pointer;}
-  #worldMap .island-marker{fill:rgba(0,22,42,.78);stroke:rgba(123,200,245,.76);stroke-width:.85;vector-effect:non-scaling-stroke;pointer-events:auto;cursor:pointer;}
+  #worldMap .island-country-hit{fill:none;stroke:transparent;stroke-width:8;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer;}
+  #worldMap .island-country-outline{fill:none;stroke:rgba(123,200,245,.9);stroke-width:.7;vector-effect:non-scaling-stroke;pointer-events:none;}
+  #worldMap .island-country-outline.selected{stroke:var(--highlight);stroke-width:1.5;}
+  #worldMap .island-marker{fill:none;stroke:rgba(123,200,245,.9);stroke-width:.7;vector-effect:non-scaling-stroke;pointer-events:none;}
+  #worldMap .island-marker.selected{stroke:var(--highlight);stroke-width:1.4;}
   #worldMap .island-label{fill:#d9ecff;font-family:'Barlow Condensed',sans-serif;font-size:6.4px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-anchor:middle;paint-order:stroke;stroke:#00162a;stroke-width:2.2;stroke-linejoin:round;pointer-events:auto;cursor:pointer;}
-  #worldMap .island-outline-item:hover .island-boundary{stroke:#ffffff;fill:rgba(200,169,81,.08);}
-  #worldMap .island-outline-item:hover .island-marker{stroke:#ffffff;fill:var(--highlight);}
-  .side-panel{width:420px;flex-shrink:0;background:var(--panel-bg);border-left:1px solid rgba(59,130,196,.25);display:flex;flex-direction:column;padding:24px 24px 112px;overflow-y:auto;}
+  #worldMap .island-outline-item:hover .island-country-outline,#worldMap .island-outline-item:hover .island-marker{stroke:#ffffff;}
+  .side-panel{width:var(--panel-width);flex-shrink:0;background:var(--panel-bg);border-left:1px solid rgba(59,130,196,.25);display:flex;flex-direction:column;padding:24px 24px 104px;overflow:hidden;}
   .panel-name{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.08em;line-height:1;margin-bottom:3px;color:var(--panel-text);}
   .panel-pop{font-size:.76rem;color:var(--panel-text-dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;}
   .panel-leader{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:.1em;margin-bottom:18px;color:var(--panel-text);}
@@ -73,10 +76,10 @@
   .magnifier-circle{width:260px;height:260px;border-radius:50%;border:2px solid rgba(140,200,255,.65);box-shadow:0 0 0 1px rgba(100,180,255,.1),0 12px 60px rgba(0,0,0,.65);overflow:hidden;position:relative;background:#0d2c54;}
   .magnifier-circle svg{position:absolute;top:0;left:0;}
   /* Side panel */
-  .side-panel{width:420px;flex-shrink:0;background:#1a3a60;border-left:1px solid rgba(59,130,196,.25);display:flex;flex-direction:column;padding:24px 24px 112px;overflow-y:auto;}
-  .panel-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;opacity:.4;text-align:center;gap:14px;}
+  .side-panel{width:var(--panel-width);flex-shrink:0;background:#1a3a60;border-left:1px solid rgba(59,130,196,.25);display:flex;flex-direction:column;padding:24px 24px 104px;overflow:hidden;}
+  .panel-empty{display:flex;flex:1;min-height:0;flex-direction:column;align-items:center;justify-content:center;opacity:.4;text-align:center;gap:14px;}
   .panel-empty p{font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:#e8eef5;}
-  .panel-content{display:none;flex-direction:column;animation:fadeIn .4s ease;}
+  .panel-content{display:none;flex:1;min-height:0;overflow-y:auto;flex-direction:column;animation:fadeIn .4s ease;padding-right:4px;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
   .panel-region{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:7px;display:flex;align-items:center;gap:8px;}
   .panel-region::before{content:'';width:18px;height:1px;background:var(--gold);}
@@ -93,7 +96,7 @@
   .no-prayers{font-size:.74rem;color:#8ab0cc;font-style:italic;letter-spacing:.04em;line-height:1.6;}
   .instructions{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:.63rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(127,163,200,.35);pointer-events:none;white-space:nowrap;}
   /* Pinned prayer cards at bottom of side panel */
-  .pinned-prayers{margin-top:auto;margin-bottom:12px;padding-top:12px;display:flex;flex-direction:column;gap:8px;border-top:1px solid rgba(59,130,196,.2);transform:translateY(38px);}
+  .pinned-prayers{margin-top:12px;margin-bottom:0;padding-top:12px;display:flex;flex-shrink:0;flex-direction:column;gap:8px;border-top:1px solid rgba(59,130,196,.2);transform:none;}
   .pinned-card{background:rgba(0,22,42,.82);border:1px solid rgba(0,115,174,.5);border-radius:4px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;}
   .pinned-card-header{display:flex;align-items:center;gap:8px;}
   .pinned-flag{font-size:1.3rem;line-height:1;flex-shrink:0;}
@@ -374,6 +377,20 @@
       <label class="settings-label">Text Size <span id="uiScaleLabel">100%</span></label>
       <input class="settings-slider" type="range" id="uiScaleSlider" min="0.9" max="1.5" step="0.05" value="1.0" oninput="onUiScaleSlider(this.value)">
       <p class="settings-hint">Scales interface text across the app without changing magnifier country names.</p>
+    </div>
+
+    <div class="settings-divider"></div>
+
+    <div class="settings-section">Canvas</div>
+    <div class="settings-row">
+      <label class="settings-label">Aspect Ratio <span id="aspectRatioLabel">16:9</span></label>
+      <div class="pos-grid">
+        <button class="pos-btn aspect-btn active" onclick="setAspectRatio('16:9', this)">16:9</button>
+        <button class="pos-btn aspect-btn" onclick="setAspectRatio('21:9', this)">21:9</button>
+        <button class="pos-btn aspect-btn" onclick="setAspectRatio('4:3', this)">4:3</button>
+        <button class="pos-btn aspect-btn" onclick="setAspectRatio('4:5', this)">4:5</button>
+      </div>
+      <p class="settings-hint">Choose the shape you are designing for before editing country info or exporting.</p>
     </div>
 
     <div class="settings-divider"></div>
@@ -881,7 +898,7 @@ const numToAlpha2 = {
   462:"MV",466:"ML",470:"MT",474:"MQ",478:"MR",480:"MU",484:"MX",492:"MC",496:"MN",
   498:"MD",499:"ME",504:"MA",508:"MZ",512:"OM",516:"NA",520:"NR",524:"NP",528:"NL",
   531:"CW",533:"AW",534:"SX",535:"BQ",540:"NC",548:"VU",554:"NZ",558:"NI",562:"NE",
-  566:"NG",578:"NO",583:"FM",585:"PW",586:"PK",591:"PA",598:"PG",600:"PY",604:"PE",
+  566:"NG",578:"NO",583:"FM",584:"MH",585:"PW",586:"PK",591:"PA",598:"PG",600:"PY",604:"PE",
   608:"PH",616:"PL",620:"PT",624:"GW",626:"TL",630:"PR",634:"QA",638:"RE",642:"RO",
   643:"RU",646:"RW",654:"SH",659:"KN",662:"LC",663:"MF",670:"VC",678:"ST",682:"SA",
   686:"SN",688:"RS",694:"SL",702:"SG",703:"SK",704:"VN",705:"SI",706:"SO",710:"ZA",716:"ZW",
@@ -905,6 +922,8 @@ let selectedCountry = null, countryPaths = {}, pathElements = {}, featureMap = {
 let geoPath, geoProjection;
 let activeView = 'World';
 let activeContinent = null;
+let selectedSupplementPath = null;
+let islandSupplementElements = {};
 let magnifierEnabled = true;
 const CONTINENTS = ['Africa','Antarctica','Asia','Europe','North America','Oceania','South America'];
 const CONTINENT_VIEWBOXES = {
@@ -916,24 +935,26 @@ const CONTINENT_VIEWBOXES = {
   'Oceania': '620 227 230 180',
   'South America': '157 183 205 250'
 };
-const ISLAND_OUTLINES = [
-  { code:'PW', label:'Palau', bbox:[130, 2, 136, 10] },
-  { code:'GU', label:'Guam', bbox:[142, 11, 147, 16] },
-  { code:'FM', label:'Micronesia', bbox:[137, 0, 165, 12] },
-  { code:'MH', label:'Marshall Islands', bbox:[160, 4, 176, 15] },
-  { code:'NR', label:'Nauru', bbox:[165, -2, 168, 1] },
-  { code:'KI', label:'Kiribati', bbox:[168, -6, 193, 7] },
-  { code:'TV', label:'Tuvalu', bbox:[176, -10, 181, -5] },
-  { code:'TK', label:'Tokelau', bbox:[187, -11, 191, -7] },
-  { code:'WS', label:'Samoa', bbox:[187, -16, 193, -12] },
-  { code:'WF', label:'Wallis and Futuna', bbox:[181, -15, 185, -12] },
-  { code:'TO', label:'Tonga', bbox:[184, -23, 190, -15] },
-  { code:'FJ', label:'Fiji', bbox:[175, -21, 183, -15] },
-  { code:'VU', label:'Vanuatu', bbox:[164, -21, 171, -13] },
-  { code:'SB', label:'Solomon Islands', bbox:[154, -13, 164, -5] },
-  { code:'CK', label:'Cook Islands', bbox:[196, -23, 204, -8] },
-  { code:'PF', label:'French Polynesia', bbox:[205, -28, 235, -8] },
-  { code:'NC', label:'New Caledonia', bbox:[162, -24, 168, -18] }
+const ISLAND_SUPPLEMENT_URL = 'https://unpkg.com/world-atlas@2/countries-10m.json';
+const ISLAND_VIEW_COUNTRIES = new Set(['PW','GU','FM','MH','NR','KI','TV','TK','WS','WF','TO','FJ','VU','SB','CK','PF','NC']);
+const ISLAND_LABELS = [
+  { code:'PW', label:'Palau', lon:133, lat:6 },
+  { code:'GU', label:'Guam', lon:144.5, lat:13.5 },
+  { code:'FM', label:'Micronesia', lon:151, lat:6 },
+  { code:'MH', label:'Marshall Islands', lon:168, lat:9.5 },
+  { code:'NR', label:'Nauru', lon:166.5, lat:-0.5 },
+  { code:'KI', label:'Kiribati', lon:180.5, lat:0.5 },
+  { code:'TV', label:'Tuvalu', lon:178.5, lat:-7.5 },
+  { code:'TK', label:'Tokelau', lon:189, lat:-9 },
+  { code:'WS', label:'Samoa', lon:190, lat:-14 },
+  { code:'WF', label:'Wallis and Futuna', lon:183, lat:-13.5 },
+  { code:'TO', label:'Tonga', lon:187, lat:-19 },
+  { code:'FJ', label:'Fiji', lon:179, lat:-18 },
+  { code:'VU', label:'Vanuatu', lon:167.5, lat:-17 },
+  { code:'SB', label:'Solomon Islands', lon:159, lat:-9 },
+  { code:'CK', label:'Cook Islands', lon:200, lat:-15.5 },
+  { code:'PF', label:'French Polynesia', lon:220, lat:-18 },
+  { code:'NC', label:'New Caledonia', lon:165, lat:-21 }
 ];
 const ISLAND_WRAP_SHIFT_X = 820;
 const MAP_EXTENT = { x:0, y:0, w:1000, h:500 };
@@ -973,6 +994,13 @@ let magOffsetY = 0;
 let magConeTipOffsetX = 0;
 let magConeTipOffsetY = 0;
 let uiScale = 1.0;
+let designAspect = '16:9';
+const ASPECT_PRESETS = {
+  '16:9': { w:1920, h:1080, panel:420 },
+  '21:9': { w:1792, h:768, panel:450 },
+  '4:3': { w:1600, h:1200, panel:480 },
+  '4:5': { w:1080, h:1350, panel:520 }
+};
 
 function loadFallbackMap() {
   fetch('https://unpkg.com/world-atlas@2/countries-110m.json')
@@ -1065,74 +1093,147 @@ function buildD3Map(world) {
     });
   });
 
-  renderIslandOverlay();
+  loadIslandSupplementMap();
   populateModalSelect();
   renderContinentMenu();
   applyContinentClasses();
   applyMapView(getMapViewKey());
 }
 
-function getIslandOutlineSize(item) {
-  const lonSpan = Math.abs(item.bbox[2] - item.bbox[0]);
-  const latSpan = Math.abs(item.bbox[3] - item.bbox[1]);
-  const labelWidth = (item.label.length * 3.8) + 14;
-  return {
-    w: Math.min(128, Math.max(34, lonSpan * 3.4, labelWidth)),
-    h: Math.min(72, Math.max(22, latSpan * 5.2))
-  };
+function loadIslandSupplementMap() {
+  d3.json(ISLAND_SUPPLEMENT_URL)
+    .then(renderIslandSupplementMap)
+    .catch(err => {
+      console.warn('Could not load island supplement map:', err);
+      renderIslandSupplementMap(null);
+    });
 }
 
-function renderIslandOverlay() {
+function getIslandLabel(code) {
+  return ISLAND_LABELS.find(item => item.code === code);
+}
+
+function createIslandLabel(item, x, y) {
+  const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+  label.setAttribute('x', x.toFixed(2));
+  label.setAttribute('y', (y - 5).toFixed(2));
+  label.setAttribute('class','island-label');
+  label.textContent = item.label;
+  return label;
+}
+
+function selectIslandCountry(alpha2, el) {
+  if (selectedCountry && pathElements[selectedCountry]) {
+    pathElements[selectedCountry].classList.remove('selected');
+    const prev = magSvg.querySelector(`[data-id="${selectedCountry}"]`);
+    if (prev) prev.classList.remove('mag-selected');
+  }
+  if (selectedSupplementPath) selectedSupplementPath.classList.remove('selected');
+  selectedCountry = alpha2;
+  selectedSupplementPath = el;
+  el.classList.add('selected');
+  magnifier.style.display = 'none';
+  connectorSvg.style.display = 'none';
+  showPanel(alpha2);
+}
+
+function renderIslandSupplementMap(world) {
   document.getElementById('islandOverlay')?.remove();
+  islandSupplementElements = {};
   const group = document.createElementNS('http://www.w3.org/2000/svg','g');
   group.setAttribute('id','islandOverlay');
   group.setAttribute('class','island-overlay');
 
-  ISLAND_OUTLINES.forEach(item => {
-    const center = geoProjection([(item.bbox[0] + item.bbox[2]) / 2, (item.bbox[1] + item.bbox[3]) / 2]);
-    if (!center) return;
-    const shiftX = center[0] < 300 ? ISLAND_WRAP_SHIFT_X : 0;
-    const labelX = center[0] + shiftX;
-    const size = getIslandOutlineSize(item);
+  if (world) {
+    const features = topojson.feature(world, world.objects.countries).features;
+    features.forEach(feature => {
+      const alpha2 = numToAlpha2[parseInt(feature.id)];
+      if (!ISLAND_VIEW_COUNTRIES.has(alpha2)) return;
+      const item = getIslandLabel(alpha2);
+      if (!item) return;
+      const d = geoPath(feature);
+      const center = geoPath.centroid(feature);
+      if (!d || !center || !Number.isFinite(center[0]) || !Number.isFinite(center[1])) return;
+      const shiftX = center[0] < 300 ? ISLAND_WRAP_SHIFT_X : 0;
+      const labelX = center[0] + shiftX;
 
-    const outlineItem = document.createElementNS('http://www.w3.org/2000/svg','g');
-    outlineItem.setAttribute('class','island-outline-item');
-    outlineItem.setAttribute('data-id', item.code);
+      const outlineItem = document.createElementNS('http://www.w3.org/2000/svg','g');
+      outlineItem.setAttribute('class','island-outline-item');
+      outlineItem.setAttribute('data-id', alpha2);
+      if (shiftX) outlineItem.setAttribute('transform', `translate(${shiftX} 0)`);
 
-    const boundary = document.createElementNS('http://www.w3.org/2000/svg','rect');
-    boundary.setAttribute('x', (labelX - size.w / 2).toFixed(2));
-    boundary.setAttribute('y', (center[1] - size.h / 2).toFixed(2));
-    boundary.setAttribute('width', size.w.toFixed(2));
-    boundary.setAttribute('height', size.h.toFixed(2));
-    boundary.setAttribute('class','island-boundary');
-    outlineItem.appendChild(boundary);
+      const hit = document.createElementNS('http://www.w3.org/2000/svg','path');
+      hit.setAttribute('d', d);
+      hit.setAttribute('class','island-country-hit');
+      outlineItem.appendChild(hit);
 
-    const marker = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    marker.setAttribute('cx', labelX.toFixed(2));
-    marker.setAttribute('cy', center[1].toFixed(2));
-    marker.setAttribute('r', '2.1');
-    marker.setAttribute('class','island-marker');
-    outlineItem.appendChild(marker);
+      const outline = document.createElementNS('http://www.w3.org/2000/svg','path');
+      outline.setAttribute('d', d);
+      outline.setAttribute('class','island-country-outline');
+      outline.setAttribute('data-id', alpha2);
+      outlineItem.appendChild(outline);
+      islandSupplementElements[alpha2] = outline;
 
-    const label = document.createElementNS('http://www.w3.org/2000/svg','text');
-    label.setAttribute('x', labelX.toFixed(2));
-    label.setAttribute('y', (center[1] - 5).toFixed(2));
-    label.setAttribute('class','island-label');
-    label.textContent = item.label;
-    outlineItem.appendChild(label);
+      const label = createIslandLabel(item, labelX - shiftX, center[1]);
+      outlineItem.appendChild(label);
 
-    outlineItem.addEventListener('click', e => {
-      e.stopPropagation();
-      if (consumeMapDragClick()) return;
-      if (pathElements[item.code] && featureMap[item.code]) {
-        onCountryClick(item.code, pathElements[item.code], featureMap[item.code]);
-      }
+      const clickTarget = pathElements[alpha2] || outline;
+      outlineItem.addEventListener('click', e => {
+        e.stopPropagation();
+        if (consumeMapDragClick()) return;
+        if (pathElements[alpha2] && featureMap[alpha2]) {
+          onCountryClick(alpha2, pathElements[alpha2], featureMap[alpha2]);
+        } else {
+          featureMap[alpha2] = feature;
+          countryPaths[alpha2] = d;
+          pathElements[alpha2] = outline;
+          selectIslandCountry(alpha2, clickTarget);
+        }
+      });
+
+      group.appendChild(outlineItem);
     });
+  }
 
-    group.appendChild(outlineItem);
-  });
+  renderTokelauSupplement(group);
 
   mapSvg.appendChild(group);
+}
+
+function renderTokelauSupplement(group) {
+  const item = getIslandLabel('TK');
+  const center = geoProjection([item.lon, item.lat]);
+  if (!center) return;
+  const shiftX = center[0] < 300 ? ISLAND_WRAP_SHIFT_X : 0;
+  const labelX = center[0] + shiftX;
+  const outlineItem = document.createElementNS('http://www.w3.org/2000/svg','g');
+  outlineItem.setAttribute('class','island-outline-item');
+  outlineItem.setAttribute('data-id','TK');
+
+  [[-2,-2],[1,0],[3,2]].forEach(([dx, dy]) => {
+    const marker = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    marker.setAttribute('cx', (labelX + dx).toFixed(2));
+    marker.setAttribute('cy', (center[1] + dy).toFixed(2));
+    marker.setAttribute('r', '1.25');
+    marker.setAttribute('class','island-marker');
+    outlineItem.appendChild(marker);
+  });
+
+  const hit = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  hit.setAttribute('cx', labelX.toFixed(2));
+  hit.setAttribute('cy', center[1].toFixed(2));
+  hit.setAttribute('r', '9');
+  hit.setAttribute('class','island-country-hit');
+  outlineItem.appendChild(hit);
+
+  outlineItem.appendChild(createIslandLabel(item, labelX, center[1]));
+  islandSupplementElements.TK = outlineItem.querySelector('.island-marker');
+  outlineItem.addEventListener('click', e => {
+    e.stopPropagation();
+    if (consumeMapDragClick()) return;
+    selectIslandCountry('TK', outlineItem.querySelector('.island-marker'));
+  });
+  group.appendChild(outlineItem);
 }
 
 function getDisplayFeature(alpha2, feature) {
@@ -1224,6 +1325,8 @@ function clearSelectedCountry() {
     const magEl = magSvg.querySelector(`[data-id="${selectedCountry}"]`);
     if (magEl) magEl.classList.remove('mag-selected');
   }
+  if (selectedSupplementPath) selectedSupplementPath.classList.remove('selected');
+  selectedSupplementPath = null;
   selectedCountry = null;
   magnifier.style.display = 'none';
   connectorSvg.style.display = 'none';
@@ -1443,6 +1546,8 @@ function onCountryClick(alpha2, el, feature) {
     const prev = magSvg.querySelector(`[data-id="${selectedCountry}"]`);
     if (prev) prev.classList.remove('mag-selected');
   }
+  if (selectedSupplementPath) selectedSupplementPath.classList.remove('selected');
+  selectedSupplementPath = null;
   selectedCountry = alpha2;
   el.classList.add('selected');
   const magEl = magSvg.querySelector(`[data-id="${alpha2}"]`);
@@ -2136,6 +2241,7 @@ function settingsOverlayClick(e) {
 function applyUiScale(value, persist = true) {
   uiScale = Math.max(0.9, Math.min(1.5, parseFloat(value) || 1));
   root.style.setProperty('--ui-scale', uiScale.toFixed(2));
+  updatePanelWidth();
   const slider = document.getElementById('uiScaleSlider');
   const label = document.getElementById('uiScaleLabel');
   if (slider) slider.value = uiScale.toFixed(2);
@@ -2153,6 +2259,48 @@ function loadUiScale() {
 
 function onUiScaleSlider(val) {
   applyUiScale(val);
+}
+
+function updatePanelWidth() {
+  const preset = ASPECT_PRESETS[designAspect] || ASPECT_PRESETS['16:9'];
+  const scaledExtra = Math.max(0, uiScale - 1) * 260;
+  root.style.setProperty('--panel-width', Math.round(preset.panel + scaledExtra) + 'px');
+}
+
+function applyDesignAspect(value, persist = true, updateDownload = true) {
+  designAspect = ASPECT_PRESETS[value] ? value : '16:9';
+  updatePanelWidth();
+  const label = document.getElementById('aspectRatioLabel');
+  if (label) label.textContent = designAspect;
+  document.querySelectorAll('.aspect-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim() === designAspect);
+  });
+  const preset = ASPECT_PRESETS[designAspect];
+  const widthInput = document.getElementById('dlWidth');
+  const heightInput = document.getElementById('dlHeight');
+  if (updateDownload && widthInput && heightInput) {
+    widthInput.value = preset.w;
+    heightInput.value = preset.h;
+    document.querySelectorAll('.dl-preset').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.aspect === designAspect);
+    });
+    window._dlSnapshot = null;
+    window._dlSnapshotSize = null;
+    if (document.getElementById('dlModalOverlay')?.classList.contains('open')) schedulePreview();
+  }
+  if (persist) {
+    try { localStorage.setItem('houseOfPrayerDesignAspect', designAspect); } catch(e) {}
+  }
+}
+
+function loadDesignAspect() {
+  let saved = null;
+  try { saved = localStorage.getItem('houseOfPrayerDesignAspect'); } catch(e) {}
+  applyDesignAspect(saved || '16:9', false);
+}
+
+function setAspectRatio(value) {
+  applyDesignAspect(value);
 }
 
 function onZoomSlider(val) {
@@ -2208,6 +2356,7 @@ function resetSettings() {
   customMapViewBoxes = {};
   saveMapViewBoxes();
   applyUiScale(1);
+  applyDesignAspect('16:9');
   document.getElementById('uiScaleSlider').value   = 1.0;
   document.getElementById('zoomSlider').value      = 1.0;
   document.getElementById('sizeSlider').value      = 260;
@@ -2253,6 +2402,7 @@ function consumeMapDragClick() {
 
 function onMapPointerDown(e) {
   if (e.button !== 0) return;
+  if (e.target !== mapSvg && e.target.id !== 'mainOceanRect') return;
   const view = getCurrentMapViewBox();
   mapPanState = {
     pointerId:e.pointerId,
@@ -2326,6 +2476,7 @@ mapSvg.addEventListener('wheel', onMapWheel, { passive:false });
 
 // ── COLOR THEME ENGINE ────────────────────────────────────────
 loadUiScale();
+loadDesignAspect();
 
 function setVar(name, value) {
   root.style.setProperty(name, value);
@@ -2570,6 +2721,10 @@ function selectSearchResult(alpha2) {
   const el = pathElements[alpha2];
   const feature = featureMap[alpha2];
   if (el && feature) onCountryClick(alpha2, el, feature);
+  else if (islandSupplementElements[alpha2]) {
+    setIslandView();
+    selectIslandCountry(alpha2, islandSupplementElements[alpha2]);
+  }
 }
 
 function closeSearch() {
@@ -2644,12 +2799,12 @@ loadFallbackMap();
     <div class="dl-row">
       <span class="dl-label">Preset Sizes</span>
       <div class="dl-preset-row">
-        <button class="dl-preset active" onclick="setDlSize(1920,1080,this)">1920×1080</button>
-        <button class="dl-preset" onclick="setDlSize(1792,768,this)">1792×768</button>
-        <button class="dl-preset" onclick="setDlSize(2560,1440,this)">2560×1440</button>
-        <button class="dl-preset" onclick="setDlSize(3840,2160,this)">4K</button>
-        <button class="dl-preset" onclick="setDlSize(1280,720,this)">1280×720</button>
-        <button class="dl-preset" onclick="setDlSize(1024,768,this)">1024×768</button>
+        <button class="dl-preset active" data-aspect="16:9" onclick="setDlSize(1920,1080,this)">16:9 1920×1080</button>
+        <button class="dl-preset" data-aspect="21:9" onclick="setDlSize(1792,768,this)">21:9 1792×768</button>
+        <button class="dl-preset" data-aspect="16:9" onclick="setDlSize(2560,1440,this)">16:9 2560×1440</button>
+        <button class="dl-preset" data-aspect="16:9" onclick="setDlSize(3840,2160,this)">4K</button>
+        <button class="dl-preset" data-aspect="16:9" onclick="setDlSize(1280,720,this)">16:9 1280×720</button>
+        <button class="dl-preset" data-aspect="4:3" onclick="setDlSize(1024,768,this)">4:3 1024×768</button>
       </div>
     </div>
     <div class="dl-row">
@@ -2679,6 +2834,8 @@ loadFallbackMap();
 </div>
 
 <script>
+applyDesignAspect(designAspect, false);
+
 function getDlSize() {
   return {
     w: parseInt(document.getElementById('dlWidth').value) || 1920,
@@ -2710,6 +2867,8 @@ function buildExportOverrideStyle() {
   const exportStyle = document.createElement('style');
   exportStyle.id = 'export-override';
   exportStyle.textContent = `
+    html { font-size: ${16 * uiScale}px !important; }
+    :root { --ui-scale:${uiScale.toFixed(2)} !important; --panel-width:${getComputedStyle(root).getPropertyValue('--panel-width').trim() || '420px'} !important; }
     header { background: ${headerBg} !important; }
     .side-panel { background: ${panelBg} !important; opacity:1 !important; }
     .panel-content, .panel-empty, .pinned-prayers { background:transparent !important; }
@@ -2807,6 +2966,9 @@ function captureExportCanvas(w, h, scaleOverride) {
           onclone: doc => {
             const html = doc.documentElement;
             const body = doc.body;
+            html.style.fontSize = `${16 * uiScale}px`;
+            html.style.setProperty('--ui-scale', uiScale.toFixed(2));
+            html.style.setProperty('--panel-width', getComputedStyle(root).getPropertyValue('--panel-width').trim() || '420px');
             html.style.width = `${viewport.width}px`;
             html.style.height = `${viewport.height}px`;
             html.style.overflow = 'hidden';
@@ -2896,6 +3058,9 @@ function setDlSize(w, h, btn) {
   document.getElementById('dlHeight').value = h;
   document.querySelectorAll('.dl-preset').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  if (btn.dataset.aspect && ASPECT_PRESETS[btn.dataset.aspect]) {
+    applyDesignAspect(btn.dataset.aspect, true, false);
+  }
   schedulePreview();
 }
 
