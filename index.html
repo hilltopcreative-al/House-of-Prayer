@@ -58,10 +58,11 @@
   .map-container.island-mode #worldMap .island-overlay{display:block;}
   #worldMap .island-country-hit{fill:none;stroke:transparent;stroke-width:8;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer;}
   #worldMap .island-country-outline{fill:none;stroke:rgba(123,200,245,.9);stroke-width:.7;vector-effect:non-scaling-stroke;pointer-events:none;}
-  #worldMap .island-country-outline.selected{stroke:var(--highlight);stroke-width:1.5;}
+  #worldMap .island-country-outline.selected,#worldMap .island-outline-item.selected .island-country-outline{stroke:var(--highlight);stroke-width:1.5;}
   #worldMap .island-marker{fill:none;stroke:rgba(123,200,245,.9);stroke-width:.7;vector-effect:non-scaling-stroke;pointer-events:none;}
-  #worldMap .island-marker.selected{stroke:var(--highlight);stroke-width:1.4;}
-  #worldMap .island-label{fill:#d9ecff;font-family:'Barlow Condensed',sans-serif;font-size:6.4px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-anchor:middle;paint-order:stroke;stroke:#00162a;stroke-width:2.2;stroke-linejoin:round;pointer-events:auto;cursor:pointer;}
+  #worldMap .island-marker.selected,#worldMap .island-outline-item.selected .island-marker{stroke:var(--highlight);stroke-width:1.4;}
+  #worldMap .island-label{display:none;fill:#d9ecff;font-family:'Barlow Condensed',sans-serif;font-size:6.4px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-anchor:middle;paint-order:stroke;stroke:#00162a;stroke-width:2.2;stroke-linejoin:round;pointer-events:auto;cursor:pointer;}
+  #worldMap .island-outline-item.selected .island-label{display:block;}
   #worldMap .island-outline-item:hover .island-country-outline,#worldMap .island-outline-item:hover .island-marker{stroke:#ffffff;}
   .side-panel{width:var(--panel-width);flex-shrink:0;background:var(--panel-bg);border-left:1px solid rgba(59,130,196,.25);display:flex;flex-direction:column;padding:24px 24px 104px;overflow:hidden;}
   .panel-name{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.08em;line-height:1;margin-bottom:3px;color:var(--panel-text);}
@@ -923,7 +924,9 @@ let geoPath, geoProjection;
 let activeView = 'World';
 let activeContinent = null;
 let selectedSupplementPath = null;
+let selectedSupplementItem = null;
 let islandSupplementElements = {};
+let islandSupplementData = {};
 let magnifierEnabled = true;
 const CONTINENTS = ['Africa','Antarctica','Asia','Europe','North America','Oceania','South America'];
 const CONTINENT_VIEWBOXES = {
@@ -1122,24 +1125,47 @@ function createIslandLabel(item, x, y) {
   return label;
 }
 
-function selectIslandCountry(alpha2, el) {
+function clearIslandOverlaySelection() {
+  if (selectedSupplementPath) selectedSupplementPath.classList.remove('selected');
+  if (selectedSupplementItem) selectedSupplementItem.classList.remove('selected');
+  selectedSupplementPath = null;
+  selectedSupplementItem = null;
+}
+
+function getShiftedBounds(feature, shiftX = 0) {
+  const bounds = geoPath.bounds(feature);
+  if (!bounds || !isFinite(bounds[0][0])) return bounds;
+  return [[bounds[0][0] + shiftX, bounds[0][1]], [bounds[1][0] + shiftX, bounds[1][1]]];
+}
+
+function selectIslandCountry(alpha2, el, itemGroup = null) {
   if (selectedCountry && pathElements[selectedCountry]) {
     pathElements[selectedCountry].classList.remove('selected');
     const prev = magSvg.querySelector(`[data-id="${selectedCountry}"]`);
     if (prev) prev.classList.remove('mag-selected');
   }
-  if (selectedSupplementPath) selectedSupplementPath.classList.remove('selected');
+  clearIslandOverlaySelection();
   selectedCountry = alpha2;
   selectedSupplementPath = el;
+  selectedSupplementItem = itemGroup || el.closest?.('.island-outline-item') || null;
   el.classList.add('selected');
-  magnifier.style.display = 'none';
-  connectorSvg.style.display = 'none';
+  selectedSupplementItem?.classList.add('selected');
+  const magEl = magSvg.querySelector(`[data-id="${alpha2}"]`);
+  if (magEl) magEl.classList.add('mag-selected');
+  const supplement = islandSupplementData[alpha2];
+  if (magnifierEnabled && supplement?.feature) {
+    showMagnifier(alpha2, supplement.feature, getShiftedBounds(supplement.feature, supplement.shiftX), supplement.shiftX);
+  } else {
+    magnifier.style.display = 'none';
+    connectorSvg.style.display = 'none';
+  }
   showPanel(alpha2);
 }
 
 function renderIslandSupplementMap(world) {
   document.getElementById('islandOverlay')?.remove();
   islandSupplementElements = {};
+  islandSupplementData = {};
   const group = document.createElementNS('http://www.w3.org/2000/svg','g');
   group.setAttribute('id','islandOverlay');
   group.setAttribute('class','island-overlay');
@@ -1173,21 +1199,33 @@ function renderIslandSupplementMap(world) {
       outline.setAttribute('data-id', alpha2);
       outlineItem.appendChild(outline);
       islandSupplementElements[alpha2] = outline;
+      islandSupplementData[alpha2] = { feature, shiftX, outline, group:outlineItem };
+
+      if (!magSvg.querySelector(`.mag-country[data-id="${alpha2}"]`)) {
+        const magEl = document.createElementNS('http://www.w3.org/2000/svg','path');
+        magEl.setAttribute('d', d);
+        magEl.setAttribute('class','mag-country');
+        magEl.setAttribute('data-id', alpha2);
+        if (shiftX) magEl.setAttribute('transform', `translate(${shiftX} 0)`);
+        (magSvg.querySelector('#magClipGroup') || magSvg).appendChild(magEl);
+      }
 
       const label = createIslandLabel(item, labelX - shiftX, center[1]);
       outlineItem.appendChild(label);
 
-      const clickTarget = pathElements[alpha2] || outline;
       outlineItem.addEventListener('click', e => {
         e.stopPropagation();
         if (consumeMapDragClick()) return;
         if (pathElements[alpha2] && featureMap[alpha2]) {
           onCountryClick(alpha2, pathElements[alpha2], featureMap[alpha2]);
+          selectedSupplementItem = outlineItem;
+          selectedSupplementPath = outline;
+          outlineItem.classList.add('selected');
         } else {
           featureMap[alpha2] = feature;
           countryPaths[alpha2] = d;
           pathElements[alpha2] = outline;
-          selectIslandCountry(alpha2, clickTarget);
+          selectIslandCountry(alpha2, outline, outlineItem);
         }
       });
 
@@ -1228,10 +1266,11 @@ function renderTokelauSupplement(group) {
 
   outlineItem.appendChild(createIslandLabel(item, labelX, center[1]));
   islandSupplementElements.TK = outlineItem.querySelector('.island-marker');
+  islandSupplementData.TK = { feature:null, shiftX:0, outline:islandSupplementElements.TK, group:outlineItem };
   outlineItem.addEventListener('click', e => {
     e.stopPropagation();
     if (consumeMapDragClick()) return;
-    selectIslandCountry('TK', outlineItem.querySelector('.island-marker'));
+    selectIslandCountry('TK', outlineItem.querySelector('.island-marker'), outlineItem);
   });
   group.appendChild(outlineItem);
 }
@@ -1325,8 +1364,7 @@ function clearSelectedCountry() {
     const magEl = magSvg.querySelector(`[data-id="${selectedCountry}"]`);
     if (magEl) magEl.classList.remove('mag-selected');
   }
-  if (selectedSupplementPath) selectedSupplementPath.classList.remove('selected');
-  selectedSupplementPath = null;
+  clearIslandOverlaySelection();
   selectedCountry = null;
   magnifier.style.display = 'none';
   connectorSvg.style.display = 'none';
@@ -1546,12 +1584,18 @@ function onCountryClick(alpha2, el, feature) {
     const prev = magSvg.querySelector(`[data-id="${selectedCountry}"]`);
     if (prev) prev.classList.remove('mag-selected');
   }
-  if (selectedSupplementPath) selectedSupplementPath.classList.remove('selected');
-  selectedSupplementPath = null;
+  clearIslandOverlaySelection();
   selectedCountry = alpha2;
   el.classList.add('selected');
   const magEl = magSvg.querySelector(`[data-id="${alpha2}"]`);
   if (magEl) magEl.classList.add('mag-selected');
+  const supplement = islandSupplementData[alpha2];
+  if (activeView === 'Island' && supplement?.group) {
+    selectedSupplementPath = supplement.outline;
+    selectedSupplementItem = supplement.group;
+    selectedSupplementPath?.classList.add('selected');
+    selectedSupplementItem.classList.add('selected');
+  }
 
   const bounds = geoPath.bounds(feature);
   const area = (bounds[1][0]-bounds[0][0]) * (bounds[1][1]-bounds[0][1]);
@@ -1574,13 +1618,14 @@ function getVisualCentroid(alpha2) {
   } catch(e) { return null; }
 }
 
-function showMagnifier(alpha2, feature, bounds) {
+function showMagnifier(alpha2, feature, bounds, visualShiftX = 0) {
   const cr = mapContainer.getBoundingClientRect();
 
   // Use the SVG's own transform matrix to convert viewBox coords → screen pixels.
   // This is the only method that is 100% correct for all preserveAspectRatio modes,
   // scale factors, and window sizes.
   const geoCentroid = geoPath.centroid(feature);
+  if (visualShiftX) geoCentroid[0] += visualShiftX;
   let cx, cy;
   try {
     const ctm = mapSvg.getScreenCTM();
@@ -1664,11 +1709,37 @@ function showMagnifier(alpha2, feature, bounds) {
   magSvg.querySelectorAll('.mag-country').forEach(el => el.style.display = '');
 
   updateMagLabels(alpha2, vbX, vbY, vbW, vbH, sz);
+  if (islandSupplementData[alpha2]?.feature) {
+    addSelectedIslandMagLabel(alpha2, bCx, bCy, vbW, sz);
+  }
 
   const magCX = mx + half;
   const magCY = my + half;
   // Apply user cone offset to the tip (independent of circle position)
   drawConnector(magCX, magCY, half, cx + magConeTipOffsetX, cy + magConeTipOffsetY);
+}
+
+function addSelectedIslandMagLabel(alpha2, x, y, vbW, sz) {
+  const label = countryData[alpha2]?.name || alpha2;
+  const magTarget = magSvg.querySelector('#magClipGroup') || magSvg;
+  const labelText = label.toUpperCase();
+  const alreadyLabeled = Array.from(magTarget.querySelectorAll('.mag-label'))
+    .some(el => el.textContent.replace(/\s+/g, ' ').trim() === labelText);
+  if (alreadyLabeled) return;
+  const textEl = document.createElementNS('http://www.w3.org/2000/svg','text');
+  textEl.setAttribute('x', x);
+  textEl.setAttribute('y', y);
+  textEl.setAttribute('class','mag-label');
+  textEl.setAttribute('text-anchor','middle');
+  textEl.setAttribute('dominant-baseline','middle');
+  textEl.setAttribute('font-size', magSelectedFontPx * (vbW / sz));
+  textEl.setAttribute('fill','rgba(255,255,255,1.0)');
+  textEl.setAttribute('font-family','Alte Haas Grotesk,Arial Narrow,sans-serif');
+  textEl.setAttribute('font-weight','900');
+  textEl.setAttribute('letter-spacing','0.07em');
+  textEl.setAttribute('pointer-events','none');
+  textEl.textContent = labelText;
+  magTarget.appendChild(textEl);
 }
 
 // Simple point-in-polygon using ray casting on SVG path
@@ -2386,11 +2457,13 @@ function refreshMagnifier() {
     setMagnifierVisibility(false);
     return;
   }
-  if (!selectedCountry || !featureMap[selectedCountry]) return;
-  const feature = featureMap[selectedCountry];
-  const bounds  = geoPath.bounds(feature);
+  if (!selectedCountry) return;
+  const supplement = islandSupplementData[selectedCountry];
+  const feature = supplement?.feature || featureMap[selectedCountry];
+  if (!feature) return;
+  const bounds = supplement?.feature ? getShiftedBounds(feature, supplement.shiftX) : geoPath.bounds(feature);
   const area = (bounds[1][0]-bounds[0][0]) * (bounds[1][1]-bounds[0][1]);
-  if (area < MAG_AREA_THRESHOLD) showMagnifier(selectedCountry, feature, bounds);
+  if (area < MAG_AREA_THRESHOLD) showMagnifier(selectedCountry, feature, bounds, supplement?.shiftX || 0);
   else setMagnifierVisibility(false);
 }
 
