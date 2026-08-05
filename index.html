@@ -355,7 +355,7 @@
 </div>
 
 <div class="floating-actions" data-no-export="true">
-  <div class="floating-copyright">App &amp; data © 2026 hilltopcrtv. All rights reserved.</div>
+  <div class="floating-copyright">App &amp; data © 2026 The Well Scottsboro Inc. All rights reserved.</div>
   <div class="floating-button-row">
     <button class="upload-btn support-float-btn" id="supportBtn" onclick="openSupportModal()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a4 4 0 01-4 4H7l-4 4V7a4 4 0 014-4h10a4 4 0 014 4z"/></svg>
@@ -636,7 +636,7 @@
       <div class="support-list">
         <div class="support-item">
           <h3>App &amp; Data</h3>
-          <p>The app build and underlying country/prayer data are © 2026 hilltopcrtv. All rights reserved.</p>
+          <p>The app build and underlying country/prayer data are © 2026 The Well Scottsboro Inc. All rights reserved.</p>
         </div>
         <div class="support-item">
           <h3>Saved Info</h3>
@@ -2943,8 +2943,10 @@ function buildExportOverrideStyle() {
     html { font-size: ${16 * uiScale}px !important; }
     :root { --ui-scale:${uiScale.toFixed(2)} !important; --panel-width:${getComputedStyle(root).getPropertyValue('--panel-width').trim() || '420px'} !important; }
     header { background: ${headerBg} !important; }
-    .side-panel { background: ${panelBg} !important; opacity:1 !important; }
-    .panel-content, .panel-empty, .pinned-prayers { background:transparent !important; }
+    .side-panel { background: ${panelBg} !important; opacity:1 !important; position:relative !important; overflow:hidden !important; padding-bottom:calc(var(--export-pinned-height, 185px) + 34px) !important; }
+    .panel-content { background:transparent !important; overflow:hidden !important; max-height:calc(100% - var(--export-pinned-height, 185px) - 34px) !important; }
+    .panel-empty { background:transparent !important; }
+    .pinned-prayers { background:transparent !important; position:absolute !important; left:24px !important; right:24px !important; bottom:24px !important; margin:0 !important; z-index:5 !important; }
     .map-container { background: linear-gradient(to bottom, ${oceanTop} 0%, ${oceanBottom} 100%) center center / 100% 135% no-repeat !important; }
     .pinned-card { background: rgba(0,0,0,0.25) !important; border-color:${accent} !important; }
     .panel-divider { background: ${accent} !important; opacity:1 !important; }
@@ -3004,6 +3006,13 @@ function applyExportFrame(viewport) {
   };
 }
 
+function setExportPinnedHeight(targetRoot = document.documentElement, sourceDoc = document) {
+  const pinned = sourceDoc.querySelector('.pinned-prayers');
+  const height = pinned ? Math.ceil(pinned.getBoundingClientRect().height) : 185;
+  targetRoot.style.setProperty('--export-pinned-height', Math.max(120, height) + 'px');
+  return height;
+}
+
 function captureExportCanvas(w, h, scaleOverride) {
   const viewport = getExportViewport(w, h);
   const { exportStyle, headerBg } = buildExportOverrideStyle();
@@ -3020,10 +3029,13 @@ function captureExportCanvas(w, h, scaleOverride) {
   const savedVis = hideEls.map(el => ({ el, v: el.style.visibility }));
   hideEls.forEach(el => el.style.visibility = 'hidden');
   const restoreExportFrame = applyExportFrame(viewport);
+  const savedPinnedHeight = root.style.getPropertyValue('--export-pinned-height');
+  requestAnimationFrame(() => setExportPinnedHeight(root));
 
   return new Promise((resolve, reject) => {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
+        setExportPinnedHeight(root);
         html2canvas(document.body, {
           width: viewport.width,
           height: viewport.height,
@@ -3050,10 +3062,13 @@ function captureExportCanvas(w, h, scaleOverride) {
             body.style.minWidth = `${viewport.width}px`;
             body.style.minHeight = `${viewport.height}px`;
             body.style.overflow = 'hidden';
+            setExportPinnedHeight(html, doc);
           }
         }).then(resolve).catch(reject).finally(() => {
           savedVis.forEach(({ el, v }) => el.style.visibility = v);
           document.getElementById('export-override')?.remove();
+          if (savedPinnedHeight) root.style.setProperty('--export-pinned-height', savedPinnedHeight);
+          else root.style.removeProperty('--export-pinned-height');
           restoreExportFrame();
         });
       });
